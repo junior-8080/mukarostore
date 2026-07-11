@@ -18,12 +18,12 @@ const DELIVERY = 50;
 const MOMO = {
   network: "MTN Mobile Money",
   number: "055 XXX XXXX",
-  name: "Dasanda Closet",
+  name: "Sutura by Feesah",
 };
 const BANK = {
   bank: "Absa Bank Ghana",
   account: "XXXX XXXX XXXX",
-  name: "Dasanda Closet Ltd",
+  name: "Sutura by Feesah Ltd",
   branch: "Accra Main Branch",
 };
 // ─────────────────────────────────────────────────────────────────────────────

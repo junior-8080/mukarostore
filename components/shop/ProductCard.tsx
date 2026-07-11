@@ -11,6 +11,13 @@ const BADGE_STYLES: Record<string, string> = {
   "Eid Special": "bg-brand-gold-dark text-white",
 };
 
+function formatPrice(value: number) {
+  return `GH₵${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 interface ProductCardProps {
   product: Product;
   index: number;
@@ -26,10 +33,10 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-card-hover transition-shadow duration-400 flex flex-col cursor-pointer"
+      className="group flex flex-col cursor-pointer"
       onClick={() => onViewDetails(product)}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-brand-ivory-dark">
+      <div className="relative w-full aspect-[4/5] rounded-sm overflow-hidden bg-brand-ivory-dark">
         {image ? (
           <Image
             src={image}
@@ -54,20 +61,21 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
         )}
       </div>
 
-      <div className="p-4 flex flex-col gap-1 flex-1">
-        <h3 className="font-serif text-sm font-semibold text-brand-black leading-snug">
-          {product.name}
-        </h3>
-        <div className="mt-auto pt-2 flex items-baseline gap-2">
-          <span className="font-semibold text-brand-gold-dark text-sm">
-            GHS {product.price.toLocaleString()}
+      <h3 className="mt-4 text-[13px] font-bold uppercase tracking-[0.8px] text-brand-black leading-snug">
+        {product.name}
+      </h3>
+      <div className="text-brand-gold text-xs tracking-[2px] mt-1.5" aria-hidden>
+        ★★★★★
+      </div>
+      <div className="mt-1.5 flex items-baseline gap-2">
+        <span className="text-sm font-semibold text-brand-black">
+          {formatPrice(product.price)}
+        </span>
+        {product.originalPrice && (
+          <span className="text-xs text-brand-black-light line-through">
+            {formatPrice(product.originalPrice)}
           </span>
-          {product.originalPrice && (
-            <span className="text-xs text-brand-black-light line-through">
-              GHS {product.originalPrice.toLocaleString()}
-            </span>
-          )}
-        </div>
+        )}
       </div>
     </motion.div>
   );

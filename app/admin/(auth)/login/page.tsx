@@ -35,7 +35,7 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-[#FEFEFD] flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-[#CDCAC3] p-8">
-        <h1 className="font-serif text-2xl font-bold text-black mb-1">Dasanda Admin</h1>
+        <h1 className="font-serif text-2xl font-bold text-black mb-1">Sutura Admin</h1>
         <p className="text-sm text-black/50 mb-7">Sign in to manage your store</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,7 +47,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full border border-[#CDCAC3] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#9B7A51] transition-colors"
-              placeholder="admin@dasandacloset.com"
+              placeholder="admin@suturabyfeesah.com"
             />
           </div>
           <div>

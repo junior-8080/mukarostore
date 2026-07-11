@@ -7,8 +7,6 @@ import { X, Minus, Plus, ShoppingBag, Check, ChevronLeft, ChevronRight } from "l
 import { useCart } from "@/lib/cart-context";
 import type { Product } from "@/lib/data";
 
-const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Custom"];
-
 const BADGE_STYLES: Record<string, string> = {
   "Best Seller": "bg-brand-gold text-white",
   "New": "bg-brand-black text-white",
@@ -22,13 +20,18 @@ interface ProductDrawerProps {
 
 export default function ProductDrawer({ product, onClose }: ProductDrawerProps) {
   const { add, setCartOpen } = useCart();
-  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedSize, setSelectedSize] = useState("");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [selectedImg, setSelectedImg] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
-  useEffect(() => { setSelectedImg(0); }, [product?._id]);
+  useEffect(() => {
+    setSelectedImg(0);
+    setSelectedSize("");
+    setQty(1);
+    setAdded(false);
+  }, [product?._id]);
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
@@ -44,12 +47,12 @@ export default function ProductDrawer({ product, onClose }: ProductDrawerProps) 
   }
 
   function handleAdd() {
-    if (!product) return;
+    if (!product || !selectedSize.trim()) return;
     for (let i = 0; i < qty; i++) {
-      add(product, selectedSize);
+      add(product, selectedSize.trim());
     }
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 3000);
   }
 
   function handleViewCart() {
@@ -77,7 +80,7 @@ export default function ProductDrawer({ product, onClose }: ProductDrawerProps) 
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 340, damping: 34 }}
-            className="fixed right-0 top-0 h-full w-full max-w-lg bg-white z-50 flex flex-col shadow-2xl overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white z-50 flex flex-col shadow-2xl overflow-y-auto"
           >
             {/* Close */}
             <button
@@ -97,7 +100,7 @@ export default function ProductDrawer({ product, onClose }: ProductDrawerProps) 
                 src={product.images[selectedImg] ?? ""}
                 alt={product.name}
                 fill
-                sizes="(max-width: 768px) 100vw, 512px"
+                sizes="(max-width: 768px) 100vw, 672px"
                 className="object-cover"
               />
               {product.badge && (
@@ -179,26 +182,18 @@ export default function ProductDrawer({ product, onClose }: ProductDrawerProps) 
                 {product.description}
               </p>
 
-              {/* Size selector */}
+              {/* Size */}
               <div>
                 <p className="text-xs font-semibold text-brand-black uppercase tracking-widest mb-3">
                   Size
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {SIZES.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSize(s)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${
-                        selectedSize === s
-                          ? "bg-brand-black text-white border-brand-black"
-                          : "border-brand-ivory-dark text-brand-black hover:border-brand-gold hover:text-brand-gold"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
+                <input
+                  type="text"
+                  value={selectedSize}
+                  onChange={(e) => setSelectedSize(e.target.value)}
+                  placeholder="e.g. M, 12, or your measurements"
+                  className="w-full border border-brand-ivory-dark rounded-full px-5 py-3 text-sm text-brand-black placeholder:text-brand-black-light/60 focus:outline-none focus:border-brand-gold transition-colors"
+                />
               </div>
 
               {/* Quantity + live total */}
@@ -240,39 +235,47 @@ export default function ProductDrawer({ product, onClose }: ProductDrawerProps) 
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col gap-3 pt-2">
+              <div className="pt-2">
                 <button
                   onClick={handleAdd}
-                  className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-sm transition-all duration-200 ${
-                    added
-                      ? "bg-green-600 text-white"
-                      : "bg-brand-gradient text-white shadow-brand-glow hover:shadow-lg hover:-translate-y-0.5"
-                  }`}
+                  disabled={!selectedSize.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-sm bg-brand-gradient text-white shadow-brand-glow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-brand-glow disabled:cursor-not-allowed"
                 >
-                  {added ? (
-                    <>
-                      <Check size={16} />
-                      Added to Cart
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag size={16} />
-                      Add to Cart
-                    </>
-                  )}
+                  <ShoppingBag size={16} />
+                  Add to Cart
                 </button>
-
-                {added && (
-                  <button
-                    onClick={handleViewCart}
-                    className="w-full py-3 rounded-full border border-brand-black text-brand-black text-sm font-semibold hover:bg-brand-ivory transition-colors"
-                  >
-                    View Cart
-                  </button>
+                {!selectedSize.trim() && (
+                  <p className="text-xs text-brand-black-light text-center mt-2">
+                    Enter your size above to add to cart
+                  </p>
                 )}
               </div>
             </div>
           </motion.aside>
+
+          {/* Added-to-cart alert — pinned to the top of the drawer */}
+          <AnimatePresence>
+            {added && (
+              <motion.div
+                initial={{ y: -56, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -56, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="fixed top-0 right-0 w-full max-w-2xl z-[60] bg-green-600 text-white px-6 py-3.5 flex items-center justify-between shadow-lg"
+              >
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <Check size={16} />
+                  Added to cart
+                </span>
+                <button
+                  onClick={handleViewCart}
+                  className="text-xs font-bold uppercase tracking-[0.5px] underline underline-offset-2 hover:text-white/80 transition-colors"
+                >
+                  View Cart
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>

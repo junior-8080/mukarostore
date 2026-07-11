@@ -12,24 +12,33 @@ import {
 const inputCls =
   "border border-[#CDCAC3] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#9B7A51] bg-white";
 
+function slugify(label: string) {
+  return label
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function CollectionsManager() {
   const { data: collections = [], isLoading } = useAdminCollections();
   const createCollection = useCreateCollection();
   const updateCollection = useUpdateCollection();
   const deleteCollection = useDeleteCollection();
 
-  const [newId, setNewId] = useState("");
   const [newLabel, setNewLabel] = useState("");
+  const newId = slugify(newLabel);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
+    if (!newId) return;
     await createCollection.mutateAsync({
       id: newId,
       label: newLabel,
       order: collections.length,
       active: true,
     });
-    setNewId("");
     setNewLabel("");
   }
 
@@ -41,16 +50,6 @@ export default function CollectionsManager() {
         <h2 className="font-semibold text-black mb-4">Add Collection</h2>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-black/50 mb-1">ID (slug, e.g. "kaftans")</label>
-            <input
-              value={newId}
-              onChange={(e) => setNewId(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
-              required
-              placeholder="kaftans"
-              className={inputCls + " w-full"}
-            />
-          </div>
-          <div className="flex-1">
             <label className="block text-xs text-black/50 mb-1">Label</label>
             <input
               value={newLabel}
@@ -59,11 +58,14 @@ export default function CollectionsManager() {
               placeholder="Kaftans"
               className={inputCls + " w-full"}
             />
+            <p className="text-xs text-black/40 mt-1">
+              ID: <span className="font-mono">{newId || "—"}</span>
+            </p>
           </div>
-          <div className="flex sm:items-end">
+          <div className="flex sm:items-start sm:pt-5">
             <button
               type="submit"
-              disabled={createCollection.isPending}
+              disabled={createCollection.isPending || !newId}
               className="w-full sm:w-auto bg-[#6C3D0C] hover:bg-[#9B7A51] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 flex items-center justify-center gap-1"
             >
               <Plus size={14} /> Add

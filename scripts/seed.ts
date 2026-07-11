@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: "..env.local" });
 
 import { Collection } from "../lib/models/Collection";
 import { Product } from "../lib/models/Product";

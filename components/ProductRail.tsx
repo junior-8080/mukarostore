@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useShopProducts } from "@/lib/hooks/use-shop";
-import { SAMPLE_PRODUCTS } from "@/lib/data";
 
 export default function ProductRail() {
   const { data: products = [], isLoading } = useShopProducts("all");
 
-  const featured = (products.length > 0 ? products : SAMPLE_PRODUCTS).slice(0, 10);
+  const featured = products.slice(0, 6);
+
+  if (!isLoading && featured.length === 0) return null;
 
   return (
     <section id="shop-preview" className="pt-16 pb-10">
@@ -22,7 +23,8 @@ export default function ProductRail() {
         </p>
       </div>
 
-      <div className="flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory px-6 lg:px-12 pb-3">
+      <div className="overflow-x-auto no-scrollbar snap-x snap-mandatory px-6 lg:px-12 pb-3">
+        <div className="flex gap-5 w-max mx-auto">
         {isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex-none w-[240px] sm:w-[260px] snap-start">
@@ -61,6 +63,7 @@ export default function ProductRail() {
                 </p>
               </Link>
             ))}
+        </div>
       </div>
 
       <div className="text-center mt-6">

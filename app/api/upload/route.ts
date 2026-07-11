@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const MAX_SIZE = 5 * 1024 * 1024;
+const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
 
 const r2 = new S3Client({
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Invalid file type: ${file.type}` }, { status: 400 });
     }
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: `${file.name} exceeds 5 MB` }, { status: 400 });
+      return NextResponse.json({ error: `${file.name} exceeds 10 MB` }, { status: 400 });
     }
 
     const ext = file.name.split(".").pop() ?? "jpg";

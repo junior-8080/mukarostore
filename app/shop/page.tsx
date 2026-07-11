@@ -1,142 +1,229 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowLeft, ShoppingBag, WifiOff, RefreshCw } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ShoppingBag, WifiOff, RefreshCw, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import CollectionTabs from "@/components/shop/CollectionTabs";
+import FilterSidebar from "@/components/shop/FilterSidebar";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductDrawer from "@/components/shop/ProductDrawer";
 import { useShopProducts, useShopCollections } from "@/lib/hooks/use-shop";
 import type { Product } from "@/lib/data";
 
+const SORT_OPTIONS = [
+  { id: "newest", label: "Date, new to old" },
+  { id: "price-asc", label: "Price, low to high" },
+  { id: "price-desc", label: "Price, high to low" },
+  { id: "name", label: "Name, A–Z" },
+] as const;
+
+type SortId = (typeof SORT_OPTIONS)[number]["id"];
+
 function ProductSkeleton({ index }: { index: number }) {
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col animate-pulse"
-      style={{ animationDelay: `${index * 60}ms` }}
-    >
-      <div className="aspect-[3/4] bg-brand-ivory-dark" />
-      <div className="p-4 flex flex-col gap-2">
-        <div className="h-3.5 bg-brand-ivory-dark rounded-full w-4/5" />
-        <div className="h-3 bg-brand-ivory-dark rounded-full w-2/5 mt-1" />
-      </div>
+    <div className="flex flex-col animate-pulse" style={{ animationDelay: `${index * 60}ms` }}>
+      <div className="aspect-[4/5] rounded-sm bg-brand-ivory-dark" />
+      <div className="h-3.5 bg-brand-ivory-dark rounded-full w-4/5 mt-4" />
+      <div className="h-3 bg-brand-ivory-dark rounded-full w-2/5 mt-2" />
     </div>
   );
 }
 
 export default function ShopPage() {
-  const [activeCollection, setActiveCollection] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [sort, setSort] = useState<SortId>("newest");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const { data: collections = [], isLoading: collectionsLoading } = useShopCollections();
-  const {
-    data: products = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useShopProducts(activeCollection);
+  const { data: apiCollections = [] } = useShopCollections();
+  const { data: products = [], isLoading, isError, refetch } = useShopProducts("all");
+
+  const collections = useMemo(() => {
+    const fromApi = apiCollections.filter((c) => c.id !== "all");
+    if (fromApi.length > 0) return fromApi;
+    const ids = [...new Set(products.flatMap((p) => p.collections))];
+    return ids.map((id) => ({
+      id,
+      label: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, " "),
+    }));
+  }, [apiCollections, products]);
+
+  const bounds = useMemo(() => {
+    if (products.length === 0) return { min: 0, max: 0 };
+    const prices = products.map((p) => p.price);
+    return { min: Math.min(...prices), max: Math.max(...prices) };
+  }, [products]);
+
+  const effectiveMax = maxPrice ?? bounds.max;
+
+  const filtered = useMemo(() => {
+    const list = products.filter(
+      (p) =>
+        p.price <= effectiveMax &&
+        (selectedCategories.length === 0 ||
+          p.collections.some((c) => selectedCategories.includes(c)))
+    );
+    switch (sort) {
+      case "price-asc":
+        return [...list].sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return [...list].sort((a, b) => b.price - a.price);
+      case "name":
+        return [...list].sort((a, b) => a.name.localeCompare(b.name));
+      default:
+        return list;
+    }
+  }, [products, effectiveMax, selectedCategories, sort]);
+
+  function toggleCategory(id: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  }
 
   return (
     <>
       <Navbar />
 
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-4">
-        <div className="flex items-center justify-between mb-5">
-          <h1 className="font-serif text-2xl font-bold text-brand-black">Shop</h1>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1 text-xs text-brand-black-light hover:text-brand-gold transition-colors"
-          >
-            <ArrowLeft size={12} />
+      {/* Page title strip */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-28">
+        <p className="text-[11px] text-brand-black/50 tracking-[0.5px]">
+          <Link href="/" className="hover:text-brand-gold transition-colors">
             Home
           </Link>
-        </div>
-
-        <CollectionTabs
-          collections={collections}
-          active={activeCollection}
-          onChange={setActiveCollection}
-          isLoading={collectionsLoading}
-        />
+          <span className="mx-2">/</span>
+          Shop
+        </p>
+        <h1 className="font-serif italic text-3xl sm:text-[38px] text-brand-black mt-2.5">
+          Ready-to-Wear Collection
+        </h1>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-5">
-        {isLoading ? (
-          <>
-            <div className="h-3.5 w-16 bg-brand-ivory-dark rounded-full mb-4 animate-pulse" />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {Array.from({ length: 8 }).map((_, i) => (
+      {/* Sidebar + grid */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-20 flex flex-col lg:flex-row gap-9 items-start">
+        {/* Mobile filters toggle */}
+        <button
+          onClick={() => setFiltersOpen((o) => !o)}
+          className="lg:hidden inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.5px] border border-brand-black/20 px-4 py-2.5 rounded-sm"
+        >
+          <SlidersHorizontal size={14} />
+          {filtersOpen ? "Hide Filters" : "Filters"}
+        </button>
+
+        <aside
+          className={`${filtersOpen ? "block" : "hidden"} lg:block w-full lg:w-[220px] shrink-0`}
+        >
+          <FilterSidebar
+            collections={collections}
+            selectedCategories={selectedCategories}
+            onToggleCategory={toggleCategory}
+            bounds={bounds}
+            maxPrice={effectiveMax}
+            onMaxPriceChange={setMaxPrice}
+          />
+        </aside>
+
+        <div className="flex-1 min-w-0 w-full">
+          {isLoading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-7">
+              {Array.from({ length: 9 }).map((_, i) => (
                 <ProductSkeleton key={i} index={i} />
               ))}
             </div>
-          </>
-        ) : isError ? (
-          <div className="py-24 flex flex-col items-center gap-5 text-center">
-            <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
-              <WifiOff size={28} className="text-brand-black-light" strokeWidth={1.4} />
-            </div>
-            <div>
-              <p className="font-serif text-lg font-semibold text-brand-black mb-1">
-                Couldn&apos;t load products
-              </p>
-              <p className="text-sm text-brand-black-light">
-                Check your connection and try again.
-              </p>
-            </div>
-            <button
-              onClick={() => refetch()}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-gold hover:underline"
-            >
-              <RefreshCw size={14} />
-              Retry
-            </button>
-          </div>
-        ) : products.length > 0 ? (
-          <>
-            <p className="text-xs text-brand-black-light mb-4">
-              {products.length} {products.length === 1 ? "item" : "items"}
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {products.map((product, i) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  index={i}
-                  onViewDetails={setSelectedProduct}
-                />
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="py-24 flex flex-col items-center gap-5 text-center">
-            <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
-              <ShoppingBag size={28} className="text-brand-black-light" strokeWidth={1.4} />
-            </div>
-            <div>
-              <p className="font-serif text-lg font-semibold text-brand-black mb-1">
-                Nothing here yet
-              </p>
-              <p className="text-sm text-brand-black-light max-w-xs">
-                {activeCollection === "all"
-                  ? "We're adding new pieces soon — check back later."
-                  : "No items in this collection yet."}
-              </p>
-            </div>
-            {activeCollection !== "all" && (
+          ) : isError ? (
+            <div className="py-24 flex flex-col items-center gap-5 text-center">
+              <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
+                <WifiOff size={28} className="text-brand-black-light" strokeWidth={1.4} />
+              </div>
+              <div>
+                <p className="font-serif text-lg font-semibold text-brand-black mb-1">
+                  Couldn&apos;t load products
+                </p>
+                <p className="text-sm text-brand-black-light">
+                  Check your connection and try again.
+                </p>
+              </div>
               <button
-                onClick={() => setActiveCollection("all")}
-                className="text-sm font-semibold text-brand-gold hover:underline"
+                onClick={() => refetch()}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-brand-gold hover:underline"
               >
-                Browse all items
+                <RefreshCw size={14} />
+                Retry
               </button>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <>
+              {/* Results count + sort */}
+              <div className="flex items-center justify-between pb-6 border-b border-brand-black/10 mb-8">
+                <p className="text-[13px] text-brand-black/70">
+                  There {filtered.length === 1 ? "is" : "are"} {filtered.length}{" "}
+                  {filtered.length === 1 ? "result" : "results"} in total
+                </p>
+                <label className="text-[13px] text-brand-black/70 flex items-center gap-2">
+                  <span className="hidden sm:inline">Sort by:</span>
+                  <select
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as SortId)}
+                    className="font-bold text-brand-black bg-transparent focus:outline-none cursor-pointer"
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {filtered.length > 0 ? (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-7">
+                  {filtered.map((product, i) => (
+                    <ProductCard
+                      key={product._id}
+                      product={product}
+                      index={i}
+                      onViewDetails={setSelectedProduct}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="py-24 flex flex-col items-center gap-5 text-center">
+                  <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
+                    <ShoppingBag size={28} className="text-brand-black-light" strokeWidth={1.4} />
+                  </div>
+                  <div>
+                    <p className="font-serif text-lg font-semibold text-brand-black mb-1">
+                      {products.length === 0
+                        ? "Nothing here yet"
+                        : "Nothing matches your filters"}
+                    </p>
+                    <p className="text-sm text-brand-black-light max-w-xs">
+                      {products.length === 0
+                        ? "We're adding new pieces soon — check back later."
+                        : "Try widening the price range or clearing a category."}
+                    </p>
+                  </div>
+                  {products.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategories([]);
+                        setMaxPrice(null);
+                      }}
+                      className="text-sm font-semibold text-brand-gold hover:underline"
+                    >
+                      Clear all filters
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </section>
 
-      <section className="bg-brand-black py-14 mt-10">
+      <section className="bg-brand-black py-14">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <p className="text-brand-ivory/60 text-sm uppercase tracking-widest mb-3 font-medium">
             Made-to-Fit

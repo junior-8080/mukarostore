@@ -6,5 +6,5 @@ if (!plain) {
   process.exit(1);
 }
 const hash = await bcrypt.hash(plain, 10);
-console.log("\nBcrypt hash (paste into .env.local as ADMIN_PASSWORD_HASH):\n");
+console.log("\nBcrypt hash (paste into ..env.local as ADMIN_PASSWORD_HASH):\n");
 console.log(hash);

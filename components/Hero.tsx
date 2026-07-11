@@ -24,7 +24,7 @@ export default function Hero() {
       </motion.div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-black/40 via-brand-black/10 to-brand-black/70 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-black/20 via-brand-black/10 to-brand-black/70 pointer-events-none" />
 
       {/* Content */}
       <div className="absolute left-0 right-0 bottom-16 flex flex-col items-center text-center gap-4 px-6 pointer-events-none">
@@ -32,7 +32,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-brand-gold text-xs font-semibold uppercase tracking-[3px]"
+          className="text-brand-white text-xs font-semibold uppercase tracking-[3px]"
         >
           The Feesaheffect
         </motion.p>
@@ -41,7 +41,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="font-serif text-white text-4xl sm:text-5xl lg:text-6xl font-medium leading-[1.1] max-w-3xl text-balance"
+          className="font-serif text-brand-white font-bold text-4xl sm:text-5xl lg:text-6xl font-medium leading-[1.1] max-w-3xl text-balance"
         >
           Modesty, tailored to move like confidence
         </motion.h1>

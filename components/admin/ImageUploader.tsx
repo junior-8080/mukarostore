@@ -11,17 +11,25 @@ interface ImageUploaderProps {
 
 export default function ImageUploader({ images, onChange }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
-    const form = new FormData();
-    Array.from(files).forEach((f) => form.append("images", f));
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    const data = await res.json();
-    if (data.urls) onChange([...images, ...data.urls]);
-    setUploading(false);
+    setError(null);
+    try {
+      const form = new FormData();
+      Array.from(files).forEach((f) => form.append("images", f));
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (data.urls) onChange([...images, ...data.urls]);
+      else setError(data.error ?? "Upload failed");
+    } catch {
+      setError("Upload failed — check your connection and try again.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function remove(idx: number) {
@@ -68,7 +76,8 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
       />
-      <p className="text-xs text-black/40">First image is primary. Max 5 MB per image.</p>
+      <p className="text-xs text-black/40">First image is primary. Max 10 MB per image.</p>
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   );
 }

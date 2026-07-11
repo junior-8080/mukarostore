@@ -27,7 +27,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     >
       <div className="px-6 py-7 border-b border-white/10 flex items-center justify-between">
         <div>
-          <p className="font-serif text-brand-gold text-lg font-semibold">Dasanda</p>
+          <p className="font-serif text-brand-gold text-lg font-semibold">Sutura</p>
           <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
         </div>
         <button

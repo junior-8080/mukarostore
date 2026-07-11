@@ -46,12 +46,12 @@ export default function Navbar() {
             <Link href="/" className="flex items-baseline gap-2">
               <span
                 className={`font-serif italic text-2xl font-semibold tracking-wide ${
-                  overHero ? "text-white" : "text-brand-black"
+                  overHero ? "text-brand-black" : "text-brand-black"
                 }`}
               >
                 Sutura
               </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[2px] text-brand-gold">
+              <span className="text-[11px] font-semibold uppercase tracking-[2px] text-brand-black">
                 by Feesah
               </span>
             </Link>

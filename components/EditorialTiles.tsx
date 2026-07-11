@@ -10,7 +10,7 @@ const TILES = [
   {
     eyebrow: "Bridal & Special Occasion",
     title: "Aisle-ready elegance",
-    image: "/landingPage/img04.JPG",
+    image: "/landingPage/img02.JPG",
     href: "/shop",
   },
   {
@@ -22,7 +22,7 @@ const TILES = [
   {
     eyebrow: "Eid Collection",
     title: "Festive, in full colour",
-    image: "/landingPage/img06.jpeg",
+    image: "/landingPage/img04.JPG",
     href: "/shop",
   },
 ];

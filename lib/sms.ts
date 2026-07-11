@@ -11,7 +11,7 @@ export async function sendSms(phoneNumber: string, message: string) {
     body: JSON.stringify({
       recipients: [phoneNumber],
       message,
-      sender: "DasandaCL",
+      sender: "Sutura",
     }),
   });
 
@@ -31,7 +31,7 @@ export function buildConfirmationSms(params: {
 }) {
   const { name, orderNumber, total, currency } = params;
   return (
-    `Hi ${name}, your Dasanda Closet order ${orderNumber} has been CONFIRMED! ` +
+    `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been CONFIRMED! ` +
     `Total: ${currency} ${total.toLocaleString()}. ` +
     `We will contact you shortly to arrange delivery. Thank you for shopping with us!`
   );

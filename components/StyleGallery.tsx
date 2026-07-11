@@ -3,12 +3,13 @@
 import Image from "next/image";
 
 const GALLERY = [
-  "/landingPage/img04.JPG",
-  "/landingPage/img05.JPG",
-  "/landingPage/img06.jpeg",
-  "/landingPage/img07.jpeg",
-  "/landingPage/img08.jpeg",
-  "/landingPage/img09.jpeg",
+  "/landingPage/clientStyle/img01.JPG",
+  "/landingPage/clientStyle/IMG_6110.JPG",
+  "/landingPage/clientStyle/IMG_8743.JPG",
+  "/landingPage/clientStyle/img03.JPG",
+  "/landingPage/clientStyle/img04.JPG",
+  "/landingPage/clientStyle/img05.jpeg",
+  "/landingPage/clientStyle/IMG_1878.JPG"
 ];
 
 export default function StyleGallery() {
