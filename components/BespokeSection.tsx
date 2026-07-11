@@ -6,7 +6,7 @@ import { MessageSquareText, Scissors, Check } from "lucide-react";
 import RevealSection from "@/components/RevealSection";
 import { fadeUp } from "@/lib/animations";
 
-const WHATSAPP_NUMBER = "233203865161";
+// const WHATSAPP_NUMBER = "233203865161";
 
 const STEPS = [
   { Icon: MessageSquareText, label: "Consult" },
@@ -30,21 +30,46 @@ export default function BespokeSection() {
   const [occasion, setOccasion] = useState(OCCASIONS[0]);
   const [date, setDate] = useState("");
   const [vision, setVision] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const lines = [
-      "Hello Sutura by Feesah, I'd like to book a bespoke fitting.",
-      `Name: ${name}`,
-      `Phone: ${phone}`,
-      `Occasion: ${occasion}`,
-      date ? `Preferred date: ${date}` : "",
-      vision ? `My vision: ${vision}` : "",
-    ].filter(Boolean);
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`,
-      "_blank"
-    );
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/bespoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, occasion, preferredDate: date, vision }),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+      setName("");
+      setPhone("");
+      setOccasion(OCCASIONS[0]);
+      setDate("");
+      setVision("");
+    } catch {
+      setError("Something went wrong — please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+
+    // WhatsApp handoff — disabled for now; requests are saved to the admin instead.
+    // const lines = [
+    //   "Hello Sutura by Feesah, I'd like to book a bespoke fitting.",
+    //   `Name: ${name}`,
+    //   `Phone: ${phone}`,
+    //   `Occasion: ${occasion}`,
+    //   date ? `Preferred date: ${date}` : "",
+    //   vision ? `My vision: ${vision}` : "",
+    // ].filter(Boolean);
+    // window.open(
+    //   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`,
+    //   "_blank"
+    // );
   };
 
   return (
@@ -129,13 +154,25 @@ export default function BespokeSection() {
             />
             <button
               type="submit"
-              className="mt-1.5 bg-brand-gold text-brand-black py-3.5 px-7 rounded-full text-xs font-bold uppercase tracking-[0.5px] hover:shadow-brand-glow transition-all duration-200"
+              disabled={submitting}
+              className="mt-1.5 bg-brand-gold text-brand-black py-3.5 px-7 rounded-full text-xs font-bold uppercase tracking-[0.5px] hover:shadow-brand-glow transition-all duration-200 disabled:opacity-60"
             >
-              Submit Fitting Request
+              {submitting ? "Sending…" : "Submit Fitting Request"}
             </button>
-            <p className="text-[11px] text-white/40 text-center mt-1">
-              Your request opens in WhatsApp — we reply within a day.
-            </p>
+            {submitted && (
+              <p className="text-xs text-brand-gold text-center mt-1 flex items-center justify-center gap-1.5">
+                <Check size={14} />
+                Request received — we&apos;ll reach out within a day.
+              </p>
+            )}
+            {error && (
+              <p className="text-xs text-red-400 text-center mt-1">{error}</p>
+            )}
+            {!submitted && !error && (
+              <p className="text-[11px] text-white/40 text-center mt-1">
+                We reply within a day.
+              </p>
+            )}
           </form>
         </motion.div>
       </RevealSection>

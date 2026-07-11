@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     "Ghana fashion designer",
   ],
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.jpeg",
+    apple: "/logo.jpeg",
   },
   authors: [{ name: "Sutura by Feesah" }],
   creator: "Sutura by Feesah",

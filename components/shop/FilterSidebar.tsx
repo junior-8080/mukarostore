@@ -80,7 +80,7 @@ export default function FilterSidebar({
       </Section>
 
       {collections.length > 0 && (
-        <Section title="Product Category">
+        <Section title="Product Collection">
           <div className="flex flex-col gap-3.5 text-[13px]">
             {collections.map((col) => (
               <label

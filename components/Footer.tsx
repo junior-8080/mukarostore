@@ -13,7 +13,7 @@ const SHOP_LINKS = [
 const SUPPORT_LINKS = [
   { label: "Book a Fitting", href: "/#bespoke" },
   { label: "Shop All", href: "/shop" },
-  { label: "Made-to-Fit Request", href: "/checkout?custom=1" },
+  { label: "Made-to-Fit Request", href: "/#bespoke" },
 ];
 
 export default function Footer() {

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tag, ShoppingCart, X } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingCart, Scissors, X } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/collections", label: "Collections", icon: Tag },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/bespoke", label: "Bespoke", icon: Scissors },
 ];
 
 interface AdminSidebarProps {

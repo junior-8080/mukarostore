@@ -97,7 +97,7 @@ export default function ShopPage() {
           Shop
         </p>
         <h1 className="font-serif italic text-3xl sm:text-[38px] text-brand-black mt-2.5">
-          Ready-to-Wear Collection
+          Shop the Collection
         </h1>
       </section>
 
@@ -236,7 +236,7 @@ export default function ShopPage() {
             we&apos;ll craft something just for you.
           </p>
           <Link
-            href="/checkout?custom=1"
+            href="/#bespoke"
             className="inline-flex items-center gap-2 bg-brand-gradient text-white font-semibold px-8 py-3.5 rounded-full shadow-brand-glow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
           >
             Request Made-to-Fit
