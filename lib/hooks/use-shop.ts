@@ -18,6 +18,18 @@ export function useShopProducts(collection?: string) {
   });
 }
 
+export function useShopProduct(id: string) {
+  return useQuery<Product>({
+    queryKey: ["shop", "product", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/products/${id}`);
+      if (!res.ok) throw new Error("Failed to load product");
+      return res.json();
+    },
+    enabled: Boolean(id),
+  });
+}
+
 export function useShopCollections() {
   return useQuery<ShopCollection[]>({
     queryKey: ["shop", "collections"],

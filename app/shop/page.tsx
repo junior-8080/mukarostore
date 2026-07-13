@@ -7,9 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FilterSidebar from "@/components/shop/FilterSidebar";
 import ProductCard from "@/components/shop/ProductCard";
-import ProductDrawer from "@/components/shop/ProductDrawer";
 import { useShopProducts, useShopCollections } from "@/lib/hooks/use-shop";
-import type { Product } from "@/lib/data";
 
 const SORT_OPTIONS = [
   { id: "newest", label: "Date, new to old" },
@@ -31,7 +29,6 @@ function ProductSkeleton({ index }: { index: number }) {
 }
 
 export default function ShopPage() {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [sort, setSort] = useState<SortId>("newest");
@@ -180,12 +177,7 @@ export default function ShopPage() {
               {filtered.length > 0 ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-7">
                   {filtered.map((product, i) => (
-                    <ProductCard
-                      key={product._id}
-                      product={product}
-                      index={i}
-                      onViewDetails={setSelectedProduct}
-                    />
+                    <ProductCard key={product._id} product={product} index={i} />
                   ))}
                 </div>
               ) : (
@@ -245,11 +237,6 @@ export default function ShopPage() {
       </section>
 
       <Footer />
-
-      <ProductDrawer
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
     </>
   );
 }

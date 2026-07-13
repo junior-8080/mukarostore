@@ -36,7 +36,7 @@ export default function ProductRail() {
           : featured.map((product) => (
               <Link
                 key={product._id}
-                href="/shop"
+                href={`/shop/${product._id}`}
                 className="flex-none w-[240px] sm:w-[260px] snap-start group"
               >
                 <div className="relative w-full h-[340px] rounded overflow-hidden bg-brand-ivory">

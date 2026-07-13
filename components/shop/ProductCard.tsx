@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Shirt } from "lucide-react";
 import type { Product } from "@/lib/data";
@@ -21,10 +22,9 @@ function formatPrice(value: number) {
 interface ProductCardProps {
   product: Product;
   index: number;
-  onViewDetails: (product: Product) => void;
 }
 
-export default function ProductCard({ product, index, onViewDetails }: ProductCardProps) {
+export default function ProductCard({ product, index }: ProductCardProps) {
   const image = product.images[0];
 
   return (
@@ -33,9 +33,8 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      className="group flex flex-col cursor-pointer"
-      onClick={() => onViewDetails(product)}
     >
+      <Link href={`/shop/${product._id}`} className="group flex flex-col">
       <div className="relative w-full aspect-[4/5] rounded-sm overflow-hidden bg-brand-ivory-dark">
         {image ? (
           <Image
@@ -77,6 +76,7 @@ export default function ProductCard({ product, index, onViewDetails }: ProductCa
           </span>
         )}
       </div>
+      </Link>
     </motion.div>
   );
 }
