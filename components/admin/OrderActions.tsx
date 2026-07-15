@@ -33,14 +33,14 @@ export default function OrderActions({
     updateOrder(
       { id: orderId, data: { status, notes } },
       {
-        onSuccess: () =>
+        onSuccess: (data) => {
           setToast({
             type: "success",
-            message:
-              status === "confirmed"
-                ? "Order confirmed. SMS sent to customer."
-                : "Order updated successfully.",
-          }),
+            message: data.sms?.queued
+              ? "Order updated. SMS sent to customer."
+              : "Order updated successfully.",
+          });
+        },
         onError: () =>
           setToast({ type: "error", message: "Failed to update order. Please try again." }),
       }

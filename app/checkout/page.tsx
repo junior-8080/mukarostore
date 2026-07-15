@@ -17,14 +17,14 @@ const DELIVERY = 50;
 // ── Payment details — update these with real info ─────────────────────────────
 const MOMO = {
   network: "MTN Mobile Money",
-  number: "055 XXX XXXX",
-  name: "Sutura by Feesah",
+  number: "059 1459 743",
+  name: "NafisaMuslim",
 };
 const BANK = {
-  bank: "Absa Bank Ghana",
-  account: "XXXX XXXX XXXX",
-  name: "Sutura by Feesah Ltd",
-  branch: "Accra Main Branch",
+  bank: "Zenith bank",
+  account: "6013100284",
+  name: "NAFISA MUSLIM",
+  branch: "Madina Branch",
 };
 // ─────────────────────────────────────────────────────────────────────────────
 

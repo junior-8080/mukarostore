@@ -1,3 +1,10 @@
+export function normalizePhone(phone: string) {
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  if (digits.startsWith("0")) digits = `233${digits.slice(1)}`;
+  return digits;
+}
+
 export async function sendSms(phoneNumber: string, message: string) {
   const apiKey = process.env.SMS_API_KEY;
   if (!apiKey) throw new Error("SMS_API_KEY is not set");
@@ -9,9 +16,9 @@ export async function sendSms(phoneNumber: string, message: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      recipients: [phoneNumber],
+      recipients: [normalizePhone(phoneNumber)],
       message,
-      sender: "Sutura",
+      sender: "FeesahSt",
     }),
   });
 
@@ -23,16 +30,40 @@ export async function sendSms(phoneNumber: string, message: string) {
   return res.json();
 }
 
-export function buildConfirmationSms(params: {
-  name: string;
-  orderNumber: string;
-  total: number;
-  currency: string;
-}) {
+export type OrderSmsEvent = "placed" | "confirmed" | "shipped" | "delivered" | "cancelled";
+
+export function buildOrderSms(
+  event: OrderSmsEvent,
+  params: { name: string; orderNumber: string; total: number; currency: string }
+) {
   const { name, orderNumber, total, currency } = params;
-  return (
-    `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been CONFIRMED! ` +
-    `Total: ${currency} ${total.toLocaleString()}. ` +
-    `We will contact you shortly to arrange delivery. Thank you for shopping with us!`
-  );
+  const amount = `${currency} ${total.toLocaleString()}`;
+
+  switch (event) {
+    case "placed":
+      return (
+        `Hi ${name}, we have received your Sutura by Feesah order ${orderNumber}. ` +
+        `Total: ${amount}. We will contact you shortly to confirm. Thank you for shopping with us!`
+      );
+    case "confirmed":
+      return (
+        `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been CONFIRMED! ` +
+        `Total: ${amount}. We will contact you shortly to arrange delivery. Thank you for shopping with us!`
+      );
+    case "shipped":
+      return (
+        `Hi ${name}, your Sutura by Feesah order ${orderNumber} is on its way! ` +
+        `We will contact you on delivery. Thank you for shopping with us!`
+      );
+    case "delivered":
+      return (
+        `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been delivered. ` +
+        `We hope you love it! Thank you for shopping with us!`
+      );
+    case "cancelled":
+      return (
+        `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been cancelled. ` +
+        `If this was a mistake or you have questions, please contact us.`
+      );
+  }
 }

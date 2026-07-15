@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Order } from "@/lib/models/Order";
+import { sendSms, buildOrderSms } from "@/lib/sms";
 
 function generateOrderNumber() {
   const ts = Date.now().toString(36).toUpperCase();
@@ -35,6 +36,22 @@ export async function POST(req: NextRequest) {
     items,
     total,
     notes: notes ?? "",
+  });
+
+  after(async () => {
+    try {
+      await sendSms(
+        order.customer.phone,
+        buildOrderSms("placed", {
+          name: order.customer.name,
+          orderNumber: order.orderNumber,
+          total: order.total,
+          currency: order.currency,
+        })
+      );
+    } catch (err) {
+      console.error("[SMS] Failed to send order placed message:", err);
+    }
   });
 
   return NextResponse.json({ orderNumber: order.orderNumber }, { status: 201 });
