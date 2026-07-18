@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Product, IProduct } from "@/lib/models/Product";
 import ProductDetailClient from "./ProductDetailClient";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturabyfeesah.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
 
 async function getProduct(id: string): Promise<IProduct | null> {
   if (!Types.ObjectId.isValid(id)) return null;

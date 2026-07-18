@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { connectDB } from "@/lib/mongodb";
 import { Product } from "@/lib/models/Product";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturabyfeesah.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
 
 export const revalidate = 3600;
 

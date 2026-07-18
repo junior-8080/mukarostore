@@ -11,7 +11,7 @@ import SocialProof from "@/components/SocialProof";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturabyfeesah.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
 
 const jsonLd = {
   "@context": "https://schema.org",
