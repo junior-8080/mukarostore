@@ -1,112 +1,75 @@
 import Link from "next/link";
 import { MessageCircle, Phone, Mail } from "lucide-react";
 
-const QUICK_LINKS = [
+const NAV = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "Bundles", href: "/shop?category=Bundles" },
-  { label: "About", href: "/#about" },
+  { label: "FAQ", href: "/faq" },
+];
+
+const CONTACT = [
+  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/233200000000" },
+  { icon: Phone,         label: "+233 20 000 0000", href: "tel:+233200000000" },
+  { icon: Mail,          label: "info@mukarocore.com", href: "mailto:info@mukarocore.com" },
 ];
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-navy text-white pt-14 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-          {/* Brand column */}
-          <div>
-            <p className="font-heading font-bold text-2xl text-brand-gold">MukaroCore</p>
-            <p className="text-gray-400 text-sm font-body mt-2 max-w-[260px] leading-relaxed">
-              Systems first. Hype last. Home and office essentials for Ghana, delivered with precision.
+    <footer className="bg-gray-light border-t border-gray-card">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="flex flex-col md:flex-row gap-12 md:gap-20">
+          <div className="shrink-0 max-w-[240px]">
+            <p className="font-heading font-bold text-xl text-brand-navy">MukaroStore</p>
+            <p className="text-[10px] text-gray-muted font-body uppercase tracking-widest mt-0.5">
+              Systems First.
             </p>
-            <div className="flex gap-4 mt-4">
-              <a
-                href="https://wa.me/233200000000"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-brand-gold transition-colors"
-                aria-label="WhatsApp"
-              >
-                <MessageCircle size={20} />
-              </a>
-              <a
-                href="tel:+233200000000"
-                className="text-gray-400 hover:text-brand-gold transition-colors"
-                aria-label="Phone"
-              >
-                <Phone size={20} />
-              </a>
-              <a
-                href="mailto:info@mukarocore.com"
-                className="text-gray-400 hover:text-brand-gold transition-colors"
-                aria-label="Email"
-              >
-                <Mail size={20} />
-              </a>
-            </div>
+            <p className="text-gray-muted text-sm font-body mt-4 leading-relaxed">
+              Home and office essentials for Ghana, delivered with precision.
+            </p>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-heading font-bold text-sm uppercase tracking-wider text-brand-gold mb-4">
-              Quick Links
-            </h4>
-            <ul className="space-y-2">
-              {QUICK_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="text-gray-400 text-sm font-body hover:text-brand-gold transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="flex flex-col gap-2">
+            <p className="text-[10px] text-gray-muted font-body uppercase tracking-widest mb-1">
+              Explore
+            </p>
+            {NAV.map((l) => (
+              <Link
+                key={l.label}
+                href={l.href}
+                className="text-sm font-body text-brand-navy hover:text-brand-gold transition-colors"
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
 
           {/* Contact */}
-          <div>
-            <h4 className="font-heading font-bold text-sm uppercase tracking-wider text-brand-gold mb-4">
+          <div className="flex flex-col gap-3">
+            <p className="text-[10px] text-gray-muted font-body uppercase tracking-widest mb-1">
               Contact
-            </h4>
-            <ul className="space-y-3 text-sm font-body text-gray-400">
-              <li className="flex items-center gap-2">
-                <MessageCircle size={16} className="text-brand-gold shrink-0" />
-                <a
-                  href="https://wa.me/233200000000"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-brand-gold transition-colors"
-                >
-                  WhatsApp Support
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone size={16} className="text-brand-gold shrink-0" />
-                <a
-                  href="tel:+233200000000"
-                  className="hover:text-brand-gold transition-colors"
-                >
-                  +233 20 000 0000
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail size={16} className="text-brand-gold shrink-0" />
-                <a
-                  href="mailto:info@mukarocore.com"
-                  className="hover:text-brand-gold transition-colors"
-                >
-                  info@mukarocore.com
-                </a>
-              </li>
-            </ul>
+            </p>
+            {CONTACT.map(({ icon: Icon, label, href }) => (
+              <a
+                key={label}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="flex items-center gap-2.5 text-sm font-body text-brand-navy hover:text-brand-gold transition-colors"
+              >
+                <Icon size={15} className="text-gray-muted shrink-0" />
+                {label}
+              </a>
+            ))}
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-6 text-center">
-          <p className="text-gray-500 text-xs font-body">
-            &copy; 2025 MukaroCore. Built on systems.
+        {/* Bottom bar */}
+        <div className="mt-12 pt-6 border-t border-gray-card flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs font-body text-gray-muted">
+            &copy; {new Date().getFullYear()} MukaroStore. All rights reserved.
+          </p>
+          <p className="text-xs font-body text-gray-muted">
+            Built on systems.
           </p>
         </div>
       </div>

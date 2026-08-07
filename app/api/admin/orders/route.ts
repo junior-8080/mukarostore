@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { Order } from "@/lib/models/Order";
 
 export async function GET(req: NextRequest) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const status = req.nextUrl.searchParams.get("status");
   const query: Record<string, unknown> = {};

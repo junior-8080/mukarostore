@@ -2,62 +2,43 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import CategoryFilter from "@/components/CategoryFilter";
+import SearchBar from "@/components/SearchBar";
 import type { Product } from "@/lib/data";
-import { CATEGORIES, SEED_PRODUCTS } from "@/lib/data";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-const SORT_OPTIONS = [
-  { value: "popularity", label: "Most Popular" },
-  { value: "newest", label: "Newest" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-];
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 type PageProps = {
-  searchParams: Promise<{
-    category?: string;
-    sort?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<{ category?: string; sort?: string; page?: string; q?: string }>;
 };
+
+async function getCategoryNames(): Promise<string[]> {
+  try {
+    const res = await fetch(`${BASE}/api/categories`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data as { name: string }[]).map((c) => c.name);
+  } catch {
+    return [];
+  }
+}
 
 async function getProducts(
   category: string,
   sort: string,
-  page: number
+  page: number,
+  q: string,
 ): Promise<{ products: Product[]; total: number; totalPages: number }> {
   try {
-    const params = new URLSearchParams();
-    if (category) params.set("category", category);
-    if (sort) params.set("sort", sort);
-    params.set("page", String(page));
-    params.set("limit", "12");
-
-    const res = await fetch(`${siteUrl}/api/products?${params.toString()}`, {
-      next: { revalidate: 30 },
-    });
-    if (!res.ok) throw new Error("Failed");
-    return res.json() as Promise<{ products: Product[]; total: number; totalPages: number }>;
+    const params = new URLSearchParams({ sort, page: String(page), limit: "12" });
+    if (category && category !== "All Products") params.set("category", category);
+    if (q) params.set("q", q);
+    const res = await fetch(`${BASE}/api/products?${params}`, { cache: "no-store" });
+    if (!res.ok) return { products: [], total: 0, totalPages: 0 };
+    const data = await res.json();
+    return { products: data.products ?? [], total: data.total ?? 0, totalPages: data.totalPages ?? 0 };
   } catch {
-    // Fallback to seed data
-    let products = [...SEED_PRODUCTS];
-    if (category && category !== "All Products") {
-      products = products.filter((p) => p.category === category);
-    }
-    if (sort === "price-asc") products.sort((a, b) => a.price - b.price);
-    else if (sort === "price-desc") products.sort((a, b) => b.price - a.price);
-    else if (sort === "newest")
-      products.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    else products.sort((a, b) => b.popularity - a.popularity);
-
-    const limit = 12;
-    const total = products.length;
-    const totalPages = Math.ceil(total / limit);
-    const start = (page - 1) * limit;
-    return { products: products.slice(start, start + limit), total, totalPages };
+    return { products: [], total: 0, totalPages: 0 };
   }
 }
 
@@ -66,13 +47,18 @@ export default async function ShopPage({ searchParams }: PageProps) {
   const category = sp.category ?? "";
   const sort = sp.sort ?? "popularity";
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const q = sp.q?.trim() ?? "";
 
-  const { products, total, totalPages } = await getProducts(category, sort, page);
+  const [{ products, total, totalPages }, categoryNames] = await Promise.all([
+    getProducts(category, sort, page, q),
+    getCategoryNames(),
+  ]);
 
   function buildUrl(overrides: Record<string, string>) {
     const params = new URLSearchParams();
     if (category) params.set("category", category);
     if (sort) params.set("sort", sort);
+    if (q) params.set("q", q);
     if (page > 1) params.set("page", String(page));
     for (const [k, v] of Object.entries(overrides)) {
       if (v) params.set(k, v);
@@ -84,88 +70,36 @@ export default async function ShopPage({ searchParams }: PageProps) {
   return (
     <>
       <Navbar />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <p className="text-sm text-gray-muted font-body mb-6">
-          <Link href="/" className="hover:text-brand-gold transition-colors">
-            Home
-          </Link>
+          <Link href="/" className="hover:text-brand-gold transition-colors">Home</Link>
           <span className="mx-2">/</span>
           <span className="text-brand-navy font-medium">Shop</span>
-          {category && (
-            <>
-              <span className="mx-2">/</span>
-              <span className="text-brand-gold">{category}</span>
-            </>
-          )}
+          {category && <><span className="mx-2">/</span><span className="text-brand-gold">{category}</span></>}
+          {q && <><span className="mx-2">/</span><span className="text-brand-gold">&ldquo;{q}&rdquo;</span></>}
         </p>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Sidebar */}
-          <aside className="w-full lg:w-56 shrink-0">
-            <div className="bg-white rounded-xl border border-gray-card p-4">
-              <h3 className="font-heading font-bold text-brand-navy text-sm mb-3">
-                Categories
-              </h3>
-              <ul className="space-y-1">
-                {CATEGORIES.map((cat) => (
-                  <li key={cat}>
-                    <Link
-                      href={cat === "All Products" ? "/shop" : `/shop?category=${cat}`}
-                      className={`block px-3 py-2 rounded-lg text-sm font-body transition-colors ${
-                        (cat === "All Products" && !category) || cat === category
-                          ? "bg-brand-navy text-white font-medium"
-                          : "text-brand-navy hover:bg-gray-light"
-                      }`}
-                    >
-                      {cat}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          <CategoryFilter activeCategory={category} categories={categoryNames} />
 
-              <div className="mt-6">
-                <h3 className="font-heading font-bold text-brand-navy text-sm mb-3">
-                  Sort By
-                </h3>
-                <div className="space-y-1">
-                  {SORT_OPTIONS.map((opt) => (
-                    <Link
-                      key={opt.value}
-                      href={buildUrl({ sort: opt.value, page: "1" })}
-                      className={`block px-3 py-2 rounded-lg text-sm font-body transition-colors ${
-                        sort === opt.value
-                          ? "bg-brand-gold text-brand-navy font-medium"
-                          : "text-brand-navy hover:bg-gray-light"
-                      }`}
-                    >
-                      {opt.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Product grid */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-muted font-body text-sm">
-                {total} product{total !== 1 ? "s" : ""}{" "}
-                {category ? `in ${category}` : ""}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <SearchBar initialValue={q} />
+              <p className="text-gray-muted font-body text-sm shrink-0">
+                {total} product{total !== 1 ? "s" : ""}
+                {q && <> for &ldquo;{q}&rdquo;</>}
+                {category && !q && <> in {category}</>}
+                {q && (
+                  <Link href="/shop" className="ml-2 text-brand-gold hover:underline">Clear</Link>
+                )}
               </p>
             </div>
 
             {products.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-gray-muted font-body text-lg">
-                  No products found.
-                </p>
-                <Link
-                  href="/shop"
-                  className="mt-4 inline-block text-brand-gold hover:underline font-body text-sm"
-                >
+                <p className="text-gray-muted font-body text-lg">No products found.</p>
+                <Link href="/shop" className="mt-4 inline-block text-brand-gold hover:underline font-body text-sm">
                   Browse all products
                 </Link>
               </div>
@@ -177,25 +111,16 @@ export default async function ShopPage({ searchParams }: PageProps) {
               </div>
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-10 flex items-center justify-center gap-2">
                 {page > 1 && (
-                  <Link
-                    href={buildUrl({ page: String(page - 1) })}
-                    className="px-4 py-2 rounded-lg border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors"
-                  >
+                  <Link href={buildUrl({ page: String(page - 1) })} className="px-4 py-2 border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors">
                     &larr; Prev
                   </Link>
                 )}
-                <span className="px-4 py-2 text-gray-muted font-body text-sm">
-                  Page {page} of {totalPages}
-                </span>
+                <span className="px-4 py-2 text-gray-muted font-body text-sm">Page {page} of {totalPages}</span>
                 {page < totalPages && (
-                  <Link
-                    href={buildUrl({ page: String(page + 1) })}
-                    className="px-4 py-2 rounded-lg border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors"
-                  >
+                  <Link href={buildUrl({ page: String(page + 1) })} className="px-4 py-2 border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors">
                     Next &rarr;
                   </Link>
                 )}
@@ -204,7 +129,6 @@ export default async function ShopPage({ searchParams }: PageProps) {
           </div>
         </div>
       </div>
-
       <Footer />
     </>
   );

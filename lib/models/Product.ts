@@ -4,7 +4,7 @@ export interface IProduct {
   _id: mongoose.Types.ObjectId;
   name: string;
   slug: string;
-  category: "Toiletries" | "Plastics" | "Cleaning" | "Office" | "Bundles";
+  category: string;
   isBundle: boolean;
   price: number;
   description: string;
@@ -19,11 +19,7 @@ const ProductSchema = new Schema<IProduct>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    category: {
-      type: String,
-      required: true,
-      enum: ["Toiletries", "Plastics", "Cleaning", "Office", "Bundles"],
-    },
+    category: { type: String, required: true },
     isBundle: { type: Boolean, default: false },
     price: { type: Number, required: true },
     description: { type: String, required: true },

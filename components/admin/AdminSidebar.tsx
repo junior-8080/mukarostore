@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tag, ShoppingCart, Scissors, X } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Tag, X } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/collections", label: "Collections", icon: Tag },
+  { href: "/admin/categories", label: "Categories", icon: Tag },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/admin/bespoke", label: "Bespoke", icon: Scissors },
 ];
 
 interface AdminSidebarProps {
@@ -22,25 +21,27 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full w-64 lg:w-52 bg-brand-black flex flex-col z-30 transition-transform duration-300 ease-in-out ${
+      className={`fixed left-0 top-0 h-full w-56 bg-brand-navy flex flex-col z-30 transition-transform duration-300 ease-in-out ${
         open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >
-      <div className="px-6 py-7 border-b border-white/10 flex items-center justify-between">
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/10 flex items-center justify-between">
         <div>
-          <p className="font-serif text-brand-gold text-lg font-semibold">Sutura</p>
-          <p className="text-white/40 text-xs mt-0.5">Admin Panel</p>
+          <p className="font-heading font-bold text-white text-base">MukaroStore</p>
+          <p className="text-white/30 text-[10px] font-body uppercase tracking-widest mt-0.5">Admin</p>
         </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+          className="lg:hidden p-1.5 text-white/40 hover:text-white transition-colors"
           aria-label="Close menu"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
       </div>
 
-      <nav className="flex-1 px-3 py-5 space-y-1">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
         {links.map(({ href, label, icon: Icon }) => {
           const active = href === "/admin" ? path === "/admin" : path.startsWith(href);
           return (
@@ -48,22 +49,22 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
               key={href}
               href={href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-3 lg:py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 text-sm font-body transition-colors ${
                 active
-                  ? "bg-brand-gold text-brand-black"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
+                  ? "text-brand-gold bg-white/8"
+                  : "text-white/50 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Icon size={17} />
+              <Icon size={16} strokeWidth={active ? 2.5 : 1.75} />
               {label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-6 py-5 border-t border-white/10">
-        <Link href="/" className="text-white/40 text-xs hover:text-white/70 transition-colors">
-          ← View Shop
+      <div className="px-5 py-4 border-t border-white/10">
+        <Link href="/" className="text-white/30 text-xs font-body hover:text-white/60 transition-colors">
+          ← View store
         </Link>
       </div>
     </aside>

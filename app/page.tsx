@@ -1,14 +1,13 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import TrustBadges from "@/components/TrustBadges";
 import CategoryGrid from "@/components/CategoryGrid";
 import ProductGrid from "@/components/ProductGrid";
-import FeaturedBundles from "@/components/FeaturedBundles";
-import WhyMukaroCore from "@/components/WhyMukaroCore";
+import WhyMukaroStore from "@/components/WhyMukaroStore";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import type { Product } from "@/lib/data";
-import { SEED_PRODUCTS } from "@/lib/data";
+import Link from "next/link";
+import { Store } from "lucide-react";
+import type { Product, CategoryItem } from "@/lib/data";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -18,11 +17,11 @@ const jsonLd = {
     {
       "@type": "Store",
       "@id": `${siteUrl}/#store`,
-      name: "MukaroCore",
+      name: "MukaroStore",
       description:
         "Ghana-based home and office essentials store. Quality toiletries, plastics, cleaning supplies, and office products delivered fast across Accra and nationwide.",
       url: siteUrl,
-      logo: `${siteUrl}/logo.jpeg`,
+      logo: `${siteUrl}/logo.png`,
       telephone: "+233200000000",
       email: "info@mukarocore.com",
       address: {
@@ -35,48 +34,38 @@ const jsonLd = {
     {
       "@type": "WebSite",
       "@id": `${siteUrl}/#website`,
-      name: "MukaroCore",
+      name: "MukaroStore",
       url: siteUrl,
       publisher: { "@id": `${siteUrl}/#store` },
     },
   ],
 };
 
-async function getPopularProducts(): Promise<Product[]> {
+async function getCategories(): Promise<CategoryItem[]> {
   try {
-    const res = await fetch(
-      `${siteUrl}/api/products?sort=popularity&limit=8`,
-      { next: { revalidate: 60 } }
-    );
-    if (!res.ok) throw new Error("Failed to fetch");
-    const data = await res.json() as { products: Product[] };
-    return data.products;
+    const res = await fetch(`${siteUrl}/api/categories`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
   } catch {
-    // Fall back to seed data if DB is not connected
-    return [...SEED_PRODUCTS]
-      .sort((a, b) => b.popularity - a.popularity)
-      .slice(0, 8);
+    return [];
   }
 }
 
-async function getFeaturedBundles(): Promise<Product[]> {
+async function getPopularProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(
-      `${siteUrl}/api/products?category=Bundles&sort=popularity&limit=3`,
-      { next: { revalidate: 60 } }
-    );
-    if (!res.ok) throw new Error("Failed to fetch");
-    const data = await res.json() as { products: Product[] };
-    return data.products;
+    const res = await fetch(`${siteUrl}/api/products?sort=popularity&limit=12`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.products ?? [];
   } catch {
-    return SEED_PRODUCTS.filter((p) => p.isBundle).slice(0, 3);
+    return [];
   }
 }
 
 export default async function Home() {
-  const [popularProducts, bundles] = await Promise.all([
+  const [popularProducts, categories] = await Promise.all([
     getPopularProducts(),
-    getFeaturedBundles(),
+    getCategories(),
   ]);
 
   return (
@@ -87,15 +76,53 @@ export default async function Home() {
       />
       <Navbar />
       <Hero />
-      <TrustBadges />
-      <CategoryGrid />
-      <ProductGrid
-        products={popularProducts}
-        title="Popular Products"
-        subtitle="Our top-selling home and office essentials."
-      />
-      <FeaturedBundles bundles={bundles} />
-      <WhyMukaroCore />
+      <CategoryGrid categories={categories} />
+      <section className="py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <p className="text-[11px] text-gray-muted font-body uppercase tracking-widest mb-1">
+                Top picks
+              </p>
+              <h2 className="font-heading font-bold text-2xl text-brand-navy">
+                Popular Products
+              </h2>
+            </div>
+            <Link
+              href="/shop"
+              className="text-sm font-body text-brand-gold hover:underline underline-offset-4"
+            >
+              View all →
+            </Link>
+          </div>
+          <ProductGrid products={popularProducts} />
+        </div>
+      </section>
+
+      {/* Explore more banner */}
+      <section className="px-4 pb-12 md:pb-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-brand-navy flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 px-6 py-8 sm:px-10 sm:py-10">
+            <div>
+              <p className="text-[11px] text-brand-gold font-body uppercase tracking-widest mb-2">
+                500+ products
+              </p>
+              <h3 className="font-heading font-bold text-white text-xl sm:text-2xl leading-snug">
+                There&apos;s a lot more<br className="hidden sm:block" /> where that came from.
+              </h3>
+            </div>
+            <Link
+              href="/shop"
+              className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 bg-white text-brand-navy font-heading font-bold text-sm px-7 py-3.5 hover:bg-gray-light transition-colors"
+            >
+              <Store size={16} className="shrink-0" />
+              <span className="ml-2">Explore the full shop →</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <WhyMukaroStore />
       <Newsletter />
       <Footer />
     </main>

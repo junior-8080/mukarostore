@@ -22,13 +22,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MukaroCore — Home & Office Essentials | Accra, Ghana",
-    template: "%s | MukaroCore",
+    default: "MukaroStore — Home & Office Essentials | Accra, Ghana",
+    template: "%s | MukaroStore",
   },
   description:
     "Ghana-based home and office essentials store. Quality toiletries, plastics, cleaning supplies, and office products delivered fast across Accra and nationwide. Systems first. Hype last.",
   keywords: [
-    "MukaroCore",
+    "MukaroStore",
     "home essentials Ghana",
     "office supplies Accra",
     "toiletries Ghana",
@@ -40,12 +40,12 @@ export const metadata: Metadata = {
     "Ghana post GPS delivery",
   ],
   icons: {
-    icon: "/logo.jpeg",
-    apple: "/logo.jpeg",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
-  authors: [{ name: "MukaroCore" }],
-  creator: "MukaroCore",
-  publisher: "MukaroCore",
+  authors: [{ name: "MukaroStore" }],
+  creator: "MukaroStore",
+  publisher: "MukaroStore",
   alternates: {
     canonical: "/",
   },
@@ -55,11 +55,11 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   openGraph: {
-    title: "MukaroCore — Home & Office Essentials | Accra, Ghana",
+    title: "MukaroStore — Home & Office Essentials | Accra, Ghana",
     description:
       "Quality home and office essentials for homes, offices, and institutions across Ghana. Fast delivery. No drama.",
     url: siteUrl,
-    siteName: "MukaroCore",
+    siteName: "MukaroStore",
     locale: "en_GH",
     type: "website",
     images: [
@@ -67,13 +67,13 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "MukaroCore — Home & Office Essentials, Accra",
+        alt: "MukaroStore — Home & Office Essentials, Accra",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MukaroCore — Home & Office Essentials | Accra, Ghana",
+    title: "MukaroStore — Home & Office Essentials | Accra, Ghana",
     description:
       "Quality home and office essentials for homes, offices, and institutions across Ghana. Fast delivery. No drama.",
     images: ["/og-image.jpg"],

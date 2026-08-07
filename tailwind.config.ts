@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "brand-navy": "#0A1628",
-        "brand-gold": "#D4A843",
-        "brand-green": "#1A6B3A",
-        "gray-light": "#F5F5F5",
-        "gray-card": "#EFEFEF",
-        "gray-muted": "#6B7280",
+        "brand-navy": "#18181B",   // zinc-900 — clean charcoal, no blue tint
+        "brand-gold": "#0D9488",   // teal-600 — fresh, modern, distinct
+        "brand-green": "#059669",  // emerald-600 — success / trust states
+        "gray-light": "#FAFAFA",   // near-white section backgrounds
+        "gray-card": "#E4E4E7",    // zinc-200 — subtle card / border
+        "gray-muted": "#71717A",   // zinc-500 — muted text
       },
       fontFamily: {
         heading: ["var(--font-manrope)", "system-ui", "sans-serif"],

@@ -4,22 +4,21 @@ export interface AdminProduct {
   _id: string;
   name: string;
   slug: string;
+  category: string;
+  isBundle: boolean;
   price: number;
-  originalPrice?: number;
-  collections: string[];
-  images: string[];
-  badge?: string;
   description: string;
-  inStock: boolean;
+  bundleContents?: string[];
+  images: string[];
+  popularity: number;
 }
 
-export function useAdminProducts(params: { search?: string; collection?: string } = {}) {
+export function useAdminProducts(params: { search?: string } = {}) {
   return useQuery<AdminProduct[]>({
     queryKey: ["admin", "products", params],
     queryFn: () => {
       const sp = new URLSearchParams();
       if (params.search) sp.set("search", params.search);
-      if (params.collection) sp.set("collection", params.collection);
       return fetch(`/api/admin/products?${sp}`).then((r) => r.json());
     },
   });

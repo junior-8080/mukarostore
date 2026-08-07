@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import type { Product } from "@/lib/data";
 
@@ -13,46 +14,48 @@ export default function ProductCard({ product }: Props) {
   const { add } = useCart();
 
   return (
-    <div
-      className={`bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col ${
-        product.isBundle ? "border-2 border-brand-gold" : "border border-gray-card"
-      }`}
-    >
+    <div className="group bg-white rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
       {/* Image */}
-      <Link href={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-gray-card">
+      <Link
+        href={`/product/${product.slug}`}
+        className="relative block aspect-square overflow-hidden bg-gray-light"
+      >
         <Image
           src={product.images[0] ?? "https://via.placeholder.com/400x400"}
           alt={product.name}
           fill
-          className="object-cover hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         {product.isBundle && (
-          <span className="absolute top-2 right-2 bg-brand-gold text-brand-navy text-[10px] font-heading font-bold px-2 py-0.5 rounded-full uppercase">
-            BUNDLE
+          <span className="absolute top-3 left-3 bg-brand-navy text-white text-[10px] font-heading font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
+            Bundle
           </span>
         )}
       </Link>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
-        <p className="text-gray-muted text-xs font-body uppercase tracking-wider mb-1">
+      <div className="p-4 flex flex-col gap-1.5">
+        <p className="text-gray-muted text-[10px] font-body uppercase tracking-widest">
           {product.category}
         </p>
         <Link href={`/product/${product.slug}`}>
-          <h3 className="font-heading font-semibold text-brand-navy text-sm leading-snug hover:text-brand-gold transition-colors line-clamp-2">
+          <h3 className="font-heading font-semibold text-brand-navy text-sm leading-snug hover:text-brand-gold transition-colors duration-200 line-clamp-2">
             {product.name}
           </h3>
         </Link>
-        <p className="font-heading font-bold text-brand-navy text-base mt-2">
-          GHS {product.price}
-        </p>
-        <div className="mt-auto pt-3">
+
+        {/* Price + cart icon */}
+        <div className="flex items-center justify-between mt-1">
+          <p className="font-heading font-bold text-brand-navy text-base">
+            GHS {product.price}
+          </p>
           <button
             onClick={() => add(product)}
-            className="w-full bg-brand-gold text-brand-navy font-heading font-bold text-sm py-2 rounded-lg hover:opacity-90 transition-opacity"
+            aria-label={`Add ${product.name} to cart`}
+            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-brand-navy hover:brightness-105 active:scale-90 transition-all duration-150"
           >
-            Add to Cart
+            <ShoppingCart size={15} strokeWidth={2.5} />
           </button>
         </div>
       </div>

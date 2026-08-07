@@ -9,10 +9,26 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category") ?? "";
   const sort = searchParams.get("sort") ?? "popularity";
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-  const limit = Math.max(1, parseInt(searchParams.get("limit") ?? "8", 10));
+  const limit = Math.max(1, parseInt(searchParams.get("limit") ?? "12", 10));
+  const q = searchParams.get("q")?.trim() ?? "";
 
-  const query: Record<string, unknown> = {};
-  if (category && category !== "All Products") {
+  let query: Record<string, unknown> = {};
+
+  if (q) {
+    const regex = { $regex: q, $options: "i" };
+    const isNumber = !isNaN(parseFloat(q));
+    const conditions: object[] = [
+      { name: regex },
+      { description: regex },
+      { bundleContents: regex },
+      { category: regex },
+    ];
+    if (isNumber) conditions.push({ price: parseFloat(q) });
+    query = { $or: conditions };
+    if (category && category !== "All Products") {
+      query = { $and: [{ $or: conditions }, { category }] };
+    }
+  } else if (category && category !== "All Products") {
     query.category = category;
   }
 

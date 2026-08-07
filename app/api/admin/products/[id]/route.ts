@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { Product } from "@/lib/models/Product";
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
   const product = await Product.findById(id);
@@ -11,6 +13,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
   const body = await req.json();
@@ -19,7 +22,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(product);
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
   const product = await Product.findById(id);

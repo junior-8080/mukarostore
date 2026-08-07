@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse, after } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { Order } from "@/lib/models/Order";
 import { sendSms, buildOrderSms, type OrderSmsEvent } from "@/lib/sms";
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
   const order = await Order.findById(id);
@@ -12,6 +14,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
   const body = await req.json();
