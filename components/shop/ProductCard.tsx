@@ -2,81 +2,52 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Shirt } from "lucide-react";
 import type { Product } from "@/lib/data";
-
-const BADGE_STYLES: Record<string, string> = {
-  "Best Seller": "bg-brand-gold text-white",
-  "New": "bg-brand-black text-white",
-  "Eid Special": "bg-brand-gold-dark text-white",
-};
-
-function formatPrice(value: number) {
-  return `GH₵${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
 
 interface ProductCardProps {
   product: Product;
-  index: number;
+  index?: number;
 }
 
-export default function ProductCard({ product, index }: ProductCardProps) {
+export default function ProductCard({ product }: ProductCardProps) {
   const image = product.images[0];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+    <Link
+      href={`/product/${product.slug}`}
+      className="group flex flex-col bg-white rounded-xl overflow-hidden border border-gray-card hover:shadow-md transition-shadow"
     >
-      <Link href={`/shop/${product._id}`} className="group flex flex-col">
-      <div className="relative w-full aspect-[4/5] rounded-sm overflow-hidden bg-brand-ivory-dark">
+      <div className="relative w-full aspect-square overflow-hidden bg-gray-card">
         {image ? (
           <Image
             src={image}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-brand-ivory-dark flex items-center justify-center">
-            <Shirt size={36} className="text-brand-black-light opacity-30" strokeWidth={1.2} />
+          <div className="w-full h-full bg-gray-card flex items-center justify-center">
+            <span className="text-4xl">📦</span>
           </div>
         )}
-        {product.badge && (
-          <span
-            className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${
-              BADGE_STYLES[product.badge] ?? "bg-brand-black text-white"
-            }`}
-          >
-            {product.badge}
+        {product.isBundle && (
+          <span className="absolute top-2 right-2 bg-brand-gold text-brand-navy text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+            BUNDLE
           </span>
         )}
       </div>
-
-      <h3 className="mt-4 text-[13px] font-bold uppercase tracking-[0.8px] text-brand-black leading-snug">
-        {product.name}
-      </h3>
-      <div className="text-brand-gold text-xs tracking-[2px] mt-1.5" aria-hidden>
-        ★★★★★
+      <div className="p-4">
+        <p className="text-gray-muted text-xs uppercase tracking-wider mb-1">
+          {product.category}
+        </p>
+        <h3 className="font-heading font-semibold text-brand-navy text-sm leading-snug">
+          {product.name}
+        </h3>
+        <p className="font-heading font-bold text-brand-navy mt-2">
+          GHS {product.price}
+        </p>
       </div>
-      <div className="mt-1.5 flex items-baseline gap-2">
-        <span className="text-sm font-semibold text-brand-black">
-          {formatPrice(product.price)}
-        </span>
-        {product.originalPrice && (
-          <span className="text-xs text-brand-black-light line-through">
-            {formatPrice(product.originalPrice)}
-          </span>
-        )}
-      </div>
-      </Link>
-    </motion.div>
+    </Link>
   );
 }

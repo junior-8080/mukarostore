@@ -83,9 +83,7 @@ export default async function ProductDetailPage({
       "@type": "Offer",
       price: product.price,
       priceCurrency: "GHS",
-      availability: product.inStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      availability: "https://schema.org/InStock",
       url: `${siteUrl}/shop/${id}`,
     },
   };

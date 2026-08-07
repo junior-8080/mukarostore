@@ -2,19 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-cormorant: "Cormorant Garamond", Georgia, serif;
-  --font-manrope: "Manrope", system-ui, sans-serif;
-}
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
   background-color: #FFFFFF;
-  color: #0A0A0A;
-  font-family: var(--font-manrope);
+  color: #0A1628;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -24,17 +18,17 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #FFFFFF;
+  background: #F5F5F5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C6A15B;
+  background: #D4A843;
   border-radius: 3px;
 }
 
 /* Selection color */
 ::selection {
-  background: #C6A15B;
-  color: #0A0A0A;
+  background: #D4A843;
+  color: #0A1628;
 }
 
 @layer utilities {
@@ -43,23 +37,16 @@ body {
   }
 
   .glass {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(198, 161, 91, 0.20);
+    border-bottom: 1px solid rgba(212, 168, 67, 0.20);
   }
 
   .glass-dark {
-    background: rgba(10, 10, 10, 0.85);
+    background: rgba(10, 22, 40, 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-  }
-
-  .brand-gradient-text {
-    background: linear-gradient(135deg, #C6A15B 0%, #9C7A35 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .no-scrollbar::-webkit-scrollbar {

@@ -4,7 +4,11 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import RevealSection from "@/components/RevealSection";
 import { fadeUp } from "@/lib/animations";
-import { TESTIMONIALS } from "@/lib/data";
+const TESTIMONIALS = [
+  { name: "Abena O.", role: "Customer", text: "Great products and fast delivery!" },
+  { name: "Kwame A.", role: "Verified buyer", text: "The bundle saved me so much money." },
+  { name: "Naa D.", role: "Verified buyer", text: "Everything I needed in one place." },
+];
 
 export default function SocialProof() {
   return (

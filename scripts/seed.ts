@@ -1,62 +1,47 @@
 import mongoose from "mongoose";
 import * as dotenv from "dotenv";
-dotenv.config({ path: "..env.local" });
+dotenv.config({ path: ".env.local" });
 
-import { Collection } from "../lib/models/Collection";
-import { Product } from "../lib/models/Product";
-
-function slugify(text: string) {
-  return text.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
-const SEED_COLLECTIONS = [
-  { id: "new-arrivals", label: "New Arrivals" },
-  { id: "eid", label: "Eid Collection" },
-  { id: "best-sellers", label: "Best Sellers" },
-  { id: "abayas", label: "Abayas" },
-  { id: "kaftans", label: "Kaftans" },
-];
-
-const SEED_PRODUCTS = [
-  { name: "Pearl Embroidered Abaya", price: 480, collections: ["abayas", "best-sellers"], image: "/landingPage/bestSeller.jpeg", badge: "Best Seller", description: "Flowing black abaya with delicate pearl embroidery at the cuffs and neckline." },
-  { name: "Eid Blossom Kaftan", price: 620, originalPrice: 750, collections: ["kaftans", "eid", "new-arrivals"], image: "/landingPage/newArrivals.jpeg", badge: "Eid Special", description: "Rich fabric kaftan adorned with floral prints — perfect for Eid celebrations." },
-  { name: "Classic Linen Modest Dress", price: 340, collections: ["best-sellers", "new-arrivals"], image: "/landingPage/madeToFit.jpeg", badge: "New", description: "Breathable linen dress with a flattering A-line silhouette, ideal for everyday modest wear." },
-  { name: "Golden Hour Kaftan", price: 540, collections: ["kaftans", "eid"], image: "/landingPage/bestSeller.jpeg", badge: "Eid Special", description: "Luxurious gold-trimmed kaftan that brings radiance to any gathering." },
-  { name: "Midnight Velvet Abaya", price: 720, collections: ["abayas", "new-arrivals"], image: "/landingPage/newArrivals.jpeg", badge: "New", description: "Deep midnight velvet abaya with satin lining — opulence redefined." },
-  { name: "Sage Wrap Modest Dress", price: 290, collections: ["best-sellers"], image: "/landingPage/madeToFit.jpeg", badge: "Best Seller", description: "Soft sage wrap dress with elegant drape — effortlessly modest and stylish." },
-  { name: "Rose Silk Kaftan", price: 590, originalPrice: 680, collections: ["kaftans", "new-arrivals"], image: "/landingPage/bestSeller.jpeg", badge: "New", description: "Silky rose kaftan with hand-finished edges, perfect for formal occasions." },
-  { name: "Eid Ivory Abaya Set", price: 850, collections: ["abayas", "eid"], image: "/landingPage/newArrivals.jpeg", badge: "Eid Special", description: "Coordinated ivory abaya and inner dress — the ultimate Eid statement piece." },
-];
+import ProductModel from "../lib/models/Product";
+import { SEED_PRODUCTS } from "../lib/data";
 
 async function seed() {
-  await mongoose.connect(process.env.MONGODB_URI!);
+  const uri = process.env.MONGODB_URI;
+  if (!uri) throw new Error("MONGODB_URI not set in .env.local");
+
+  await mongoose.connect(uri);
   console.log("Connected to MongoDB");
 
-  await Collection.deleteMany({});
-  await Product.deleteMany({});
+  const ops = SEED_PRODUCTS.map((p) => ({
+    updateOne: {
+      filter: { slug: p.slug },
+      update: {
+        $set: {
+          name: p.name,
+          slug: p.slug,
+          category: p.category,
+          isBundle: p.isBundle,
+          price: p.price,
+          description: p.description,
+          bundleContents: p.bundleContents,
+          images: p.images,
+          popularity: p.popularity,
+        },
+      },
+      upsert: true,
+    },
+  }));
 
-  await Collection.insertMany(
-    SEED_COLLECTIONS.map((c, i) => ({ id: c.id, label: c.label, order: i, active: true }))
+  const result = await ProductModel.bulkWrite(ops);
+  console.log(
+    `Upserted ${result.upsertedCount} new products, modified ${result.modifiedCount} existing products`
   );
-  console.log(`Seeded ${SEED_COLLECTIONS.length} collections`);
-
-  await Product.insertMany(
-    SEED_PRODUCTS.map((p) => ({
-      name: p.name,
-      slug: slugify(p.name),
-      price: p.price,
-      originalPrice: p.originalPrice,
-      collections: p.collections,
-      images: [p.image],
-      badge: p.badge,
-      description: p.description,
-      inStock: true,
-    }))
-  );
-  console.log(`Seeded ${SEED_PRODUCTS.length} products`);
 
   await mongoose.disconnect();
   console.log("Done.");
 }
 
-seed().catch((e) => { console.error(e); process.exit(1); });
+seed().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

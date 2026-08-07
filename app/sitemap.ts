@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { connectDB } from "@/lib/mongodb";
-import { Product } from "@/lib/models/Product";
+import ProductModel from "@/lib/models/Product";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const revalidate = 3600;
 
@@ -20,18 +20,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    {
+      url: `${siteUrl}/cart`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 
   try {
     await connectDB();
-    const products = await Product.find({ inStock: true })
-      .select("_id updatedAt")
-      .lean<{ _id: { toString(): string }; updatedAt?: Date }[]>();
+    const products = await ProductModel.find({})
+      .select("slug updatedAt")
+      .lean<{ slug: string; updatedAt?: Date }[]>();
 
     const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
-      url: `${siteUrl}/shop/${p._id.toString()}`,
+      url: `${siteUrl}/product/${p.slug}`,
       lastModified: p.updatedAt ?? new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.8,
     }));
 

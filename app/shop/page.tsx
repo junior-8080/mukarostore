@@ -1,240 +1,209 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { ShoppingBag, WifiOff, RefreshCw, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import FilterSidebar from "@/components/shop/FilterSidebar";
-import ProductCard from "@/components/shop/ProductCard";
-import { useShopProducts, useShopCollections } from "@/lib/hooks/use-shop";
+import ProductCard from "@/components/ProductCard";
+import type { Product } from "@/lib/data";
+import { CATEGORIES, SEED_PRODUCTS } from "@/lib/data";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 const SORT_OPTIONS = [
-  { id: "newest", label: "Date, new to old" },
-  { id: "price-asc", label: "Price, low to high" },
-  { id: "price-desc", label: "Price, high to low" },
-  { id: "name", label: "Name, A–Z" },
-] as const;
+  { value: "popularity", label: "Most Popular" },
+  { value: "newest", label: "Newest" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+];
 
-type SortId = (typeof SORT_OPTIONS)[number]["id"];
+type PageProps = {
+  searchParams: Promise<{
+    category?: string;
+    sort?: string;
+    page?: string;
+  }>;
+};
 
-function ProductSkeleton({ index }: { index: number }) {
-  return (
-    <div className="flex flex-col animate-pulse" style={{ animationDelay: `${index * 60}ms` }}>
-      <div className="aspect-[4/5] rounded-sm bg-brand-ivory-dark" />
-      <div className="h-3.5 bg-brand-ivory-dark rounded-full w-4/5 mt-4" />
-      <div className="h-3 bg-brand-ivory-dark rounded-full w-2/5 mt-2" />
-    </div>
-  );
+async function getProducts(
+  category: string,
+  sort: string,
+  page: number
+): Promise<{ products: Product[]; total: number; totalPages: number }> {
+  try {
+    const params = new URLSearchParams();
+    if (category) params.set("category", category);
+    if (sort) params.set("sort", sort);
+    params.set("page", String(page));
+    params.set("limit", "12");
+
+    const res = await fetch(`${siteUrl}/api/products?${params.toString()}`, {
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) throw new Error("Failed");
+    return res.json() as Promise<{ products: Product[]; total: number; totalPages: number }>;
+  } catch {
+    // Fallback to seed data
+    let products = [...SEED_PRODUCTS];
+    if (category && category !== "All Products") {
+      products = products.filter((p) => p.category === category);
+    }
+    if (sort === "price-asc") products.sort((a, b) => a.price - b.price);
+    else if (sort === "price-desc") products.sort((a, b) => b.price - a.price);
+    else if (sort === "newest")
+      products.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    else products.sort((a, b) => b.popularity - a.popularity);
+
+    const limit = 12;
+    const total = products.length;
+    const totalPages = Math.ceil(total / limit);
+    const start = (page - 1) * limit;
+    return { products: products.slice(start, start + limit), total, totalPages };
+  }
 }
 
-export default function ShopPage() {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [maxPrice, setMaxPrice] = useState<number | null>(null);
-  const [sort, setSort] = useState<SortId>("newest");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+export default async function ShopPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
+  const category = sp.category ?? "";
+  const sort = sp.sort ?? "popularity";
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const { data: apiCollections = [] } = useShopCollections();
-  const { data: products = [], isLoading, isError, refetch } = useShopProducts("all");
+  const { products, total, totalPages } = await getProducts(category, sort, page);
 
-  const collections = useMemo(() => {
-    const fromApi = apiCollections.filter((c) => c.id !== "all");
-    if (fromApi.length > 0) return fromApi;
-    const ids = [...new Set(products.flatMap((p) => p.collections))];
-    return ids.map((id) => ({
-      id,
-      label: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, " "),
-    }));
-  }, [apiCollections, products]);
-
-  const bounds = useMemo(() => {
-    if (products.length === 0) return { min: 0, max: 0 };
-    const prices = products.map((p) => p.price);
-    return { min: Math.min(...prices), max: Math.max(...prices) };
-  }, [products]);
-
-  const effectiveMax = maxPrice ?? bounds.max;
-
-  const filtered = useMemo(() => {
-    const list = products.filter(
-      (p) =>
-        p.price <= effectiveMax &&
-        (selectedCategories.length === 0 ||
-          p.collections.some((c) => selectedCategories.includes(c)))
-    );
-    switch (sort) {
-      case "price-asc":
-        return [...list].sort((a, b) => a.price - b.price);
-      case "price-desc":
-        return [...list].sort((a, b) => b.price - a.price);
-      case "name":
-        return [...list].sort((a, b) => a.name.localeCompare(b.name));
-      default:
-        return list;
+  function buildUrl(overrides: Record<string, string>) {
+    const params = new URLSearchParams();
+    if (category) params.set("category", category);
+    if (sort) params.set("sort", sort);
+    if (page > 1) params.set("page", String(page));
+    for (const [k, v] of Object.entries(overrides)) {
+      if (v) params.set(k, v);
+      else params.delete(k);
     }
-  }, [products, effectiveMax, selectedCategories, sort]);
-
-  function toggleCategory(id: string) {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
-    );
+    return `/shop?${params.toString()}`;
   }
 
   return (
     <>
       <Navbar />
 
-      {/* Page title strip */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-28">
-        <p className="text-[11px] text-brand-black/50 tracking-[0.5px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumb */}
+        <p className="text-sm text-gray-muted font-body mb-6">
           <Link href="/" className="hover:text-brand-gold transition-colors">
             Home
           </Link>
           <span className="mx-2">/</span>
-          Shop
-        </p>
-        <h1 className="font-serif italic text-3xl sm:text-[38px] text-brand-black mt-2.5">
-          Shop the Collection
-        </h1>
-      </section>
-
-      {/* Sidebar + grid */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-20 flex flex-col lg:flex-row gap-9 items-start">
-        {/* Mobile filters toggle */}
-        <button
-          onClick={() => setFiltersOpen((o) => !o)}
-          className="lg:hidden inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.5px] border border-brand-black/20 px-4 py-2.5 rounded-sm"
-        >
-          <SlidersHorizontal size={14} />
-          {filtersOpen ? "Hide Filters" : "Filters"}
-        </button>
-
-        <aside
-          className={`${filtersOpen ? "block" : "hidden"} lg:block w-full lg:w-[220px] shrink-0`}
-        >
-          <FilterSidebar
-            collections={collections}
-            selectedCategories={selectedCategories}
-            onToggleCategory={toggleCategory}
-            bounds={bounds}
-            maxPrice={effectiveMax}
-            onMaxPriceChange={setMaxPrice}
-          />
-        </aside>
-
-        <div className="flex-1 min-w-0 w-full">
-          {isLoading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-7">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <ProductSkeleton key={i} index={i} />
-              ))}
-            </div>
-          ) : isError ? (
-            <div className="py-24 flex flex-col items-center gap-5 text-center">
-              <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
-                <WifiOff size={28} className="text-brand-black-light" strokeWidth={1.4} />
-              </div>
-              <div>
-                <p className="font-serif text-lg font-semibold text-brand-black mb-1">
-                  Couldn&apos;t load products
-                </p>
-                <p className="text-sm text-brand-black-light">
-                  Check your connection and try again.
-                </p>
-              </div>
-              <button
-                onClick={() => refetch()}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-brand-gold hover:underline"
-              >
-                <RefreshCw size={14} />
-                Retry
-              </button>
-            </div>
-          ) : (
+          <span className="text-brand-navy font-medium">Shop</span>
+          {category && (
             <>
-              {/* Results count + sort */}
-              <div className="flex items-center justify-between pb-6 border-b border-brand-black/10 mb-8">
-                <p className="text-[13px] text-brand-black/70">
-                  There {filtered.length === 1 ? "is" : "are"} {filtered.length}{" "}
-                  {filtered.length === 1 ? "result" : "results"} in total
-                </p>
-                <label className="text-[13px] text-brand-black/70 flex items-center gap-2">
-                  <span className="hidden sm:inline">Sort by:</span>
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as SortId)}
-                    className="font-bold text-brand-black bg-transparent focus:outline-none cursor-pointer"
-                  >
-                    {SORT_OPTIONS.map((opt) => (
-                      <option key={opt.id} value={opt.id}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              {filtered.length > 0 ? (
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-7">
-                  {filtered.map((product, i) => (
-                    <ProductCard key={product._id} product={product} index={i} />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-24 flex flex-col items-center gap-5 text-center">
-                  <div className="w-16 h-16 rounded-full bg-brand-ivory-dark flex items-center justify-center">
-                    <ShoppingBag size={28} className="text-brand-black-light" strokeWidth={1.4} />
-                  </div>
-                  <div>
-                    <p className="font-serif text-lg font-semibold text-brand-black mb-1">
-                      {products.length === 0
-                        ? "Nothing here yet"
-                        : "Nothing matches your filters"}
-                    </p>
-                    <p className="text-sm text-brand-black-light max-w-xs">
-                      {products.length === 0
-                        ? "We're adding new pieces soon — check back later."
-                        : "Try widening the price range or clearing a category."}
-                    </p>
-                  </div>
-                  {products.length > 0 && (
-                    <button
-                      onClick={() => {
-                        setSelectedCategories([]);
-                        setMaxPrice(null);
-                      }}
-                      className="text-sm font-semibold text-brand-gold hover:underline"
-                    >
-                      Clear all filters
-                    </button>
-                  )}
-                </div>
-              )}
+              <span className="mx-2">/</span>
+              <span className="text-brand-gold">{category}</span>
             </>
           )}
-        </div>
-      </section>
+        </p>
 
-      <section className="bg-brand-black py-14">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <p className="text-brand-ivory/60 text-sm uppercase tracking-widest mb-3 font-medium">
-            Made-to-Fit
-          </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-brand-ivory mb-4">
-            Don&apos;t see your size?
-          </h2>
-          <p className="text-brand-ivory/70 mb-8 leading-relaxed">
-            Every piece can be tailored to your exact measurements. Contact us and
-            we&apos;ll craft something just for you.
-          </p>
-          <Link
-            href="/#bespoke"
-            className="inline-flex items-center gap-2 bg-brand-gradient text-white font-semibold px-8 py-3.5 rounded-full shadow-brand-glow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-          >
-            Request Made-to-Fit
-          </Link>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Sidebar */}
+          <aside className="w-full lg:w-56 shrink-0">
+            <div className="bg-white rounded-xl border border-gray-card p-4">
+              <h3 className="font-heading font-bold text-brand-navy text-sm mb-3">
+                Categories
+              </h3>
+              <ul className="space-y-1">
+                {CATEGORIES.map((cat) => (
+                  <li key={cat}>
+                    <Link
+                      href={cat === "All Products" ? "/shop" : `/shop?category=${cat}`}
+                      className={`block px-3 py-2 rounded-lg text-sm font-body transition-colors ${
+                        (cat === "All Products" && !category) || cat === category
+                          ? "bg-brand-navy text-white font-medium"
+                          : "text-brand-navy hover:bg-gray-light"
+                      }`}
+                    >
+                      {cat}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6">
+                <h3 className="font-heading font-bold text-brand-navy text-sm mb-3">
+                  Sort By
+                </h3>
+                <div className="space-y-1">
+                  {SORT_OPTIONS.map((opt) => (
+                    <Link
+                      key={opt.value}
+                      href={buildUrl({ sort: opt.value, page: "1" })}
+                      className={`block px-3 py-2 rounded-lg text-sm font-body transition-colors ${
+                        sort === opt.value
+                          ? "bg-brand-gold text-brand-navy font-medium"
+                          : "text-brand-navy hover:bg-gray-light"
+                      }`}
+                    >
+                      {opt.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Product grid */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-muted font-body text-sm">
+                {total} product{total !== 1 ? "s" : ""}{" "}
+                {category ? `in ${category}` : ""}
+              </p>
+            </div>
+
+            {products.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-gray-muted font-body text-lg">
+                  No products found.
+                </p>
+                <Link
+                  href="/shop"
+                  className="mt-4 inline-block text-brand-gold hover:underline font-body text-sm"
+                >
+                  Browse all products
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-10 flex items-center justify-center gap-2">
+                {page > 1 && (
+                  <Link
+                    href={buildUrl({ page: String(page - 1) })}
+                    className="px-4 py-2 rounded-lg border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors"
+                  >
+                    &larr; Prev
+                  </Link>
+                )}
+                <span className="px-4 py-2 text-gray-muted font-body text-sm">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Link
+                    href={buildUrl({ page: String(page + 1) })}
+                    className="px-4 py-2 rounded-lg border border-gray-card text-brand-navy font-body text-sm hover:bg-gray-light transition-colors"
+                  >
+                    Next &rarr;
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </section>
+      </div>
 
       <Footer />
     </>

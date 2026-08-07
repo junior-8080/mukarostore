@@ -19,11 +19,6 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/lib/cart-context";
 import { useShopProduct } from "@/lib/hooks/use-shop";
 
-const BADGE_STYLES: Record<string, string> = {
-  "Best Seller": "bg-brand-gold text-white",
-  "New": "bg-brand-black text-white",
-  "Eid Special": "bg-brand-gold-dark text-white",
-};
 
 function ProductDetailSkeleton() {
   return (
@@ -64,9 +59,9 @@ export default function ProductDetailClient({ id }: { id: string }) {
   }
 
   function handleAdd() {
-    if (!product || !selectedSize.trim()) return;
+    if (!product) return;
     for (let i = 0; i < qty; i++) {
-      add(product, selectedSize.trim());
+      add(product);
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);
@@ -142,13 +137,9 @@ export default function ProductDetailClient({ id }: { id: string }) {
                   className="object-cover"
                   priority
                 />
-                {product.badge && (
-                  <span
-                    className={`absolute top-4 left-4 text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      BADGE_STYLES[product.badge] ?? "bg-brand-black text-white"
-                    }`}
-                  >
-                    {product.badge}
+                {product.isBundle && (
+                  <span className="absolute top-4 left-4 text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-gold text-brand-navy">
+                    Bundle
                   </span>
                 )}
                 {product.images.length > 1 && (
@@ -223,11 +214,6 @@ export default function ProductDetailClient({ id }: { id: string }) {
                   <span className="text-xl font-semibold text-brand-gold-dark">
                     GHS {product.price.toLocaleString()}
                   </span>
-                  {product.originalPrice && (
-                    <span className="text-sm text-brand-black-light line-through">
-                      GHS {product.originalPrice.toLocaleString()}
-                    </span>
-                  )}
                 </div>
               </div>
 

@@ -1,15 +1,7 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Manrope, Public_Sans } from "next/font/google";
 import Providers from "@/components/Providers";
 import "./globals.css";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-cormorant",
-  display: "swap",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -18,38 +10,42 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
+const publicSans = Public_Sans({
+  subsets: ["latin"],
+  variable: "--font-public-sans",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Sutura by Feesah — The Feesaheffect | Accra, Ghana",
-    template: "%s | Sutura by Feesah",
+    default: "MukaroCore — Home & Office Essentials | Accra, Ghana",
+    template: "%s | MukaroCore",
   },
   description:
-    "Accra-based womenswear and bridal house by creative director Nafisa. Bespoke tailoring, ready-to-wear and elegant modest attire for weddings, Eid and special occasions. Nationwide delivery across Ghana.",
+    "Ghana-based home and office essentials store. Quality toiletries, plastics, cleaning supplies, and office products delivered fast across Accra and nationwide. Systems first. Hype last.",
   keywords: [
-    "Sutura by Feesah",
-    "suturabyfeesah",
-    "the Feesaheffect",
-    "bespoke tailoring Accra",
-    "bridal wear Ghana",
-    "modest fashion Ghana",
-    "womenswear Accra",
-    "Eid outfits Ghana",
-    "kaftan Ghana",
-    "abaya Ghana",
-    "wedding dress Accra",
-    "ready-to-wear Ghana",
-    "Ghana fashion designer",
+    "MukaroCore",
+    "home essentials Ghana",
+    "office supplies Accra",
+    "toiletries Ghana",
+    "cleaning supplies Accra",
+    "Ghana home store",
+    "office essentials Ghana",
+    "bulk home products Ghana",
+    "Accra delivery",
+    "Ghana post GPS delivery",
   ],
   icons: {
     icon: "/logo.jpeg",
     apple: "/logo.jpeg",
   },
-  authors: [{ name: "Sutura by Feesah" }],
-  creator: "Sutura by Feesah",
-  publisher: "Sutura by Feesah",
+  authors: [{ name: "MukaroCore" }],
+  creator: "MukaroCore",
+  publisher: "MukaroCore",
   alternates: {
     canonical: "/",
   },
@@ -59,28 +55,28 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   openGraph: {
-    title: "Sutura by Feesah — The Feesaheffect | Accra, Ghana",
+    title: "MukaroCore — Home & Office Essentials | Accra, Ghana",
     description:
-      "Bespoke tailoring, ready-to-wear and bridal wear for the modern modest woman. Designed and made in Accra.",
+      "Quality home and office essentials for homes, offices, and institutions across Ghana. Fast delivery. No drama.",
     url: siteUrl,
-    siteName: "Sutura by Feesah",
+    siteName: "MukaroCore",
     locale: "en_GH",
     type: "website",
     images: [
       {
-        url: "/landingPage/img09.jpeg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Sutura by Feesah — Bespoke & Bridal, Accra",
+        alt: "MukaroCore — Home & Office Essentials, Accra",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sutura by Feesah — The Feesaheffect | Accra, Ghana",
+    title: "MukaroCore — Home & Office Essentials | Accra, Ghana",
     description:
-      "Bespoke tailoring, ready-to-wear and bridal wear for the modern modest woman. Designed and made in Accra.",
-    images: ["/landingPage/img09.jpeg"],
+      "Quality home and office essentials for homes, offices, and institutions across Ghana. Fast delivery. No drama.",
+    images: ["/og-image.jpg"],
   },
 };
 
@@ -90,8 +86,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${manrope.variable}`}>
-      <body className="font-sans antialiased">
+    <html lang="en" className={`${manrope.variable} ${publicSans.variable}`}>
+      <body className="font-body antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

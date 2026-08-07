@@ -126,28 +126,28 @@ export default function CheckoutPage() {
         <>
           <div className="space-y-4">
             {items.map((item) => (
-              <div key={`${item.product._id}-${item.size}`} className="flex gap-4 bg-white rounded-2xl p-4 shadow-sm">
+              <div key={item.product._id} className="flex gap-4 bg-white rounded-2xl p-4 shadow-sm">
                 <div className="relative w-20 h-24 rounded-xl overflow-hidden shrink-0 bg-brand-ivory-dark">
                   <Image src={item.product.images[0] ?? "/landingPage/img06.jpeg"} alt={item.product.name} fill sizes="80px" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div>
                     <p className="font-serif text-sm font-semibold text-brand-black leading-snug">{item.product.name}</p>
-                    <p className="text-xs text-brand-black-light mt-0.5">Size: {item.size}</p>
+                    <p className="text-xs text-brand-black-light mt-0.5">{item.product.category}</p>
                   </div>
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setQty(item.product._id, item.size, item.quantity - 1)} className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-brand-ivory transition-colors">
+                      <button onClick={() => setQty(item.product._id, item.quantity - 1)} className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-brand-ivory transition-colors">
                         <Minus size={11} />
                       </button>
                       <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                      <button onClick={() => setQty(item.product._id, item.size, item.quantity + 1)} className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-brand-ivory transition-colors">
+                      <button onClick={() => setQty(item.product._id, item.quantity + 1)} className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-brand-ivory transition-colors">
                         <Plus size={11} />
                       </button>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-semibold text-brand-gold-dark">GHS {(item.product.price * item.quantity).toLocaleString()}</span>
-                      <button onClick={() => remove(item.product._id, item.size)} className="text-brand-black-light hover:text-brand-gold transition-colors">
+                      <button onClick={() => remove(item.product._id)} className="text-brand-black-light hover:text-brand-gold transition-colors">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -180,13 +180,13 @@ export default function CheckoutPage() {
 
       <div className="bg-white rounded-2xl p-4 shadow-sm space-y-2">
         {items.map((item) => (
-          <div key={`${item.product._id}-${item.size}`} className="flex items-center gap-3">
+          <div key={item.product._id} className="flex items-center gap-3">
             <div className="relative w-10 h-12 rounded-lg overflow-hidden shrink-0 bg-brand-ivory-dark">
               <Image src={item.product.images[0] ?? "/landingPage/img06.jpeg"} alt={item.product.name} fill sizes="40px" className="object-cover" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-brand-black line-clamp-1">{item.product.name}</p>
-              <p className="text-xs text-brand-black-light">Size: {item.size} · Qty: {item.quantity}</p>
+              <p className="text-xs text-brand-black-light">Qty: {item.quantity}</p>
             </div>
             <span className="text-xs font-semibold text-brand-gold-dark shrink-0">GHS {(item.product.price * item.quantity).toLocaleString()}</span>
           </div>

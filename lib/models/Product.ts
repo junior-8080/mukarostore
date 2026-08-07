@@ -4,13 +4,13 @@ export interface IProduct {
   _id: mongoose.Types.ObjectId;
   name: string;
   slug: string;
+  category: "Toiletries" | "Plastics" | "Cleaning" | "Office" | "Bundles";
+  isBundle: boolean;
   price: number;
-  originalPrice?: number;
-  collections: string[];
-  images: string[];
-  badge?: string;
   description: string;
-  inStock: boolean;
+  bundleContents?: string[];
+  images: string[];
+  popularity: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,15 +19,22 @@ const ProductSchema = new Schema<IProduct>(
   {
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
+    category: {
+      type: String,
+      required: true,
+      enum: ["Toiletries", "Plastics", "Cleaning", "Office", "Bundles"],
+    },
+    isBundle: { type: Boolean, default: false },
     price: { type: Number, required: true },
-    originalPrice: { type: Number },
-    collections: { type: [String], default: [] },
-    images: { type: [String], default: [] },
-    badge: { type: String },
     description: { type: String, required: true },
-    inStock: { type: Boolean, default: true },
+    bundleContents: { type: [String], default: undefined },
+    images: { type: [String], default: [] },
+    popularity: { type: Number, default: 50 },
   },
   { timestamps: true }
 );
 
-export const Product = models.Product || model<IProduct>("Product", ProductSchema);
+const ProductModel = models.Product || model<IProduct>("Product", ProductSchema);
+// Named export for backward compat with existing admin routes
+export const Product = ProductModel;
+export default ProductModel;

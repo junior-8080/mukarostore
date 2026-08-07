@@ -36,21 +36,21 @@ export default function CartDrawer() {
             className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-brand-ivory-dark">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-card">
               <div className="flex items-center gap-2">
                 <ShoppingBag size={18} className="text-brand-gold" />
-                <h2 className="font-serif text-lg font-semibold text-brand-black">
+                <h2 className="font-heading text-lg font-bold text-brand-navy">
                   Cart
                 </h2>
                 {count > 0 && (
-                  <span className="text-xs font-semibold bg-brand-gold text-white rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="text-xs font-bold bg-brand-gold text-brand-navy rounded-full w-5 h-5 flex items-center justify-center">
                     {count}
                   </span>
                 )}
               </div>
               <button
                 onClick={() => setCartOpen(false)}
-                className="p-2 rounded-full hover:bg-brand-ivory transition-colors text-brand-black-light"
+                className="p-2 rounded-full hover:bg-gray-light transition-colors text-brand-navy"
               >
                 <X size={18} />
               </button>
@@ -59,9 +59,9 @@ export default function CartDrawer() {
             {/* Items */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
               {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full gap-4 text-brand-black-light">
+                <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-muted">
                   <ShoppingBag size={40} strokeWidth={1.2} />
-                  <p className="text-sm">Your cart is empty.</p>
+                  <p className="text-sm font-body">Your cart is empty.</p>
                   <button
                     onClick={() => setCartOpen(false)}
                     className="text-sm font-medium text-brand-gold underline underline-offset-2"
@@ -72,13 +72,13 @@ export default function CartDrawer() {
               ) : (
                 items.map((item) => (
                   <div
-                    key={`${item.product._id}-${item.size}`}
-                    className="flex gap-4 bg-brand-ivory rounded-xl p-3"
+                    key={item.product._id}
+                    className="flex gap-4 bg-gray-light rounded-xl p-3"
                   >
                     {/* Thumbnail */}
-                    <div className="relative w-20 h-24 rounded-lg overflow-hidden shrink-0 bg-brand-ivory-dark">
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-card">
                       <Image
-                        src={item.product.images[0] ?? "/landingPage/img06.jpeg"}
+                        src={item.product.images[0] ?? "https://via.placeholder.com/80x80"}
                         alt={item.product.name}
                         fill
                         sizes="80px"
@@ -89,11 +89,11 @@ export default function CartDrawer() {
                     {/* Details */}
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
-                        <p className="font-serif text-sm font-semibold text-brand-black leading-snug line-clamp-2">
+                        <p className="font-heading text-sm font-semibold text-brand-navy leading-snug line-clamp-2">
                           {item.product.name}
                         </p>
-                        <p className="text-xs text-brand-black-light mt-0.5">
-                          Size: {item.size}
+                        <p className="text-xs text-gray-muted font-body mt-0.5">
+                          {item.product.category}
                         </p>
                       </div>
 
@@ -102,32 +102,32 @@ export default function CartDrawer() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() =>
-                              setQty(item.product._id, item.size, item.quantity - 1)
+                              setQty(item.product._id, item.quantity - 1)
                             }
-                            className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-white transition-colors"
+                            className="w-6 h-6 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
                           >
                             <Minus size={11} />
                           </button>
-                          <span className="text-sm font-medium w-4 text-center">
+                          <span className="text-sm font-medium w-4 text-center text-brand-navy">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() =>
-                              setQty(item.product._id, item.size, item.quantity + 1)
+                              setQty(item.product._id, item.quantity + 1)
                             }
-                            className="w-6 h-6 rounded-full border border-brand-ivory-dark flex items-center justify-center hover:bg-white transition-colors"
+                            className="w-6 h-6 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
                           >
                             <Plus size={11} />
                           </button>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-brand-gold-dark">
+                          <span className="text-sm font-bold text-brand-gold">
                             GHS {(item.product.price * item.quantity).toLocaleString()}
                           </span>
                           <button
-                            onClick={() => remove(item.product._id, item.size)}
-                            className="text-brand-black-light hover:text-brand-gold transition-colors"
+                            onClick={() => remove(item.product._id)}
+                            className="text-gray-muted hover:text-red-400 transition-colors"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -141,19 +141,19 @@ export default function CartDrawer() {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="px-6 py-5 border-t border-brand-ivory-dark space-y-4">
+              <div className="px-6 py-5 border-t border-gray-card space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-brand-black-light">Subtotal</span>
-                  <span className="font-serif text-lg font-bold text-brand-black">
+                  <span className="text-sm text-gray-muted font-body">Subtotal</span>
+                  <span className="font-heading text-lg font-bold text-brand-navy">
                     GHS {subtotal.toLocaleString()}
                   </span>
                 </div>
                 <Link
-                  href="/checkout"
+                  href="/cart"
                   onClick={() => setCartOpen(false)}
-                  className="block w-full text-center bg-brand-gradient text-white font-semibold py-3.5 rounded-full shadow-brand-glow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  className="block w-full text-center bg-brand-gold text-brand-navy font-heading font-bold py-3 rounded-lg hover:opacity-90 transition-opacity"
                 >
-                  Checkout
+                  Go to Cart
                 </Link>
               </div>
             )}

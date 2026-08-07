@@ -9,30 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          black: "#0A0A0A",
-          "black-light": "#161616",
-          gold: "#C6A15B",
-          "gold-dark": "#9C7A35",
-          "gold-light": "#D9C08F",
-          ivory: "#F6F0E4",
-          "ivory-dark": "#E7DEC9",
-          white: "#FFFFFF",
-        },
+        "brand-navy": "#0A1628",
+        "brand-gold": "#D4A843",
+        "brand-green": "#1A6B3A",
+        "gray-light": "#F5F5F5",
+        "gray-card": "#EFEFEF",
+        "gray-muted": "#6B7280",
       },
       fontFamily: {
-        serif: ["var(--font-cormorant)", "Georgia", "serif"],
-        sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
-      },
-      backgroundImage: {
-        "brand-gradient":
-          "linear-gradient(135deg, #C6A15B 0%, #9C7A35 100%)",
-        "brand-gradient-dark":
-          "linear-gradient(135deg, #9C7A35 0%, #6E5423 100%)",
-      },
-      boxShadow: {
-        "brand-glow": "0 8px 32px rgba(156, 122, 53, 0.25)",
-        "card-hover": "0 20px 60px rgba(0, 0, 0, 0.10)",
+        heading: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        body: ["var(--font-public-sans)", "system-ui", "sans-serif"],
       },
       animation: {
         "fade-in-up": "fadeInUp 0.6s ease-out forwards",

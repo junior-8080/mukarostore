@@ -1,55 +1,84 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Advantage from "@/components/Advantage";
-import ProductRail from "@/components/ProductRail";
-import OurStory from "@/components/OurStory";
-import EditorialTiles from "@/components/EditorialTiles";
-import BespokeSection from "@/components/BespokeSection";
-import BrandMarquee from "@/components/BrandMarquee";
-import StyleGallery from "@/components/StyleGallery";
-import SocialProof from "@/components/SocialProof";
+import TrustBadges from "@/components/TrustBadges";
+import CategoryGrid from "@/components/CategoryGrid";
+import ProductGrid from "@/components/ProductGrid";
+import FeaturedBundles from "@/components/FeaturedBundles";
+import WhyMukaroCore from "@/components/WhyMukaroCore";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import type { Product } from "@/lib/data";
+import { SEED_PRODUCTS } from "@/lib/data";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suturahbyfeesah.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "ClothingStore",
+      "@type": "Store",
       "@id": `${siteUrl}/#store`,
-      name: "Sutura by Feesah",
-      alternateName: "The Feesaheffect",
+      name: "MukaroCore",
       description:
-        "Accra-based womenswear and bridal house. Bespoke tailoring, ready-to-wear and elegant modest attire for weddings, Eid and special occasions.",
+        "Ghana-based home and office essentials store. Quality toiletries, plastics, cleaning supplies, and office products delivered fast across Accra and nationwide.",
       url: siteUrl,
-      image: `${siteUrl}/landingPage/img09.jpeg`,
       logo: `${siteUrl}/logo.jpeg`,
-      telephone: "+233203865161",
-      email: "suturabyfeesah@gmail.com",
+      telephone: "+233200000000",
+      email: "info@mukarocore.com",
       address: {
         "@type": "PostalAddress",
         addressLocality: "Accra",
         addressCountry: "GH",
       },
       currenciesAccepted: "GHS",
-      sameAs: [
-        "https://instagram.com/suturabyfeesah",
-        "https://tiktok.com/@suturabyfeesah",
-      ],
     },
     {
       "@type": "WebSite",
       "@id": `${siteUrl}/#website`,
-      name: "Sutura by Feesah",
+      name: "MukaroCore",
       url: siteUrl,
       publisher: { "@id": `${siteUrl}/#store` },
     },
   ],
 };
 
-export default function Home() {
+async function getPopularProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(
+      `${siteUrl}/api/products?sort=popularity&limit=8`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) throw new Error("Failed to fetch");
+    const data = await res.json() as { products: Product[] };
+    return data.products;
+  } catch {
+    // Fall back to seed data if DB is not connected
+    return [...SEED_PRODUCTS]
+      .sort((a, b) => b.popularity - a.popularity)
+      .slice(0, 8);
+  }
+}
+
+async function getFeaturedBundles(): Promise<Product[]> {
+  try {
+    const res = await fetch(
+      `${siteUrl}/api/products?category=Bundles&sort=popularity&limit=3`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) throw new Error("Failed to fetch");
+    const data = await res.json() as { products: Product[] };
+    return data.products;
+  } catch {
+    return SEED_PRODUCTS.filter((p) => p.isBundle).slice(0, 3);
+  }
+}
+
+export default async function Home() {
+  const [popularProducts, bundles] = await Promise.all([
+    getPopularProducts(),
+    getFeaturedBundles(),
+  ]);
+
   return (
     <main>
       <script
@@ -58,14 +87,15 @@ export default function Home() {
       />
       <Navbar />
       <Hero />
-      <Advantage />
-      <ProductRail />
-      <OurStory />
-      <EditorialTiles />
-      <BespokeSection />
-      <BrandMarquee />
-      <StyleGallery />
-      <SocialProof />
+      <TrustBadges />
+      <CategoryGrid />
+      <ProductGrid
+        products={popularProducts}
+        title="Popular Products"
+        subtitle="Our top-selling home and office essentials."
+      />
+      <FeaturedBundles bundles={bundles} />
+      <WhyMukaroCore />
       <Newsletter />
       <Footer />
     </main>

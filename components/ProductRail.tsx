@@ -36,7 +36,7 @@ export default function ProductRail() {
           : featured.map((product) => (
               <Link
                 key={product._id}
-                href={`/shop/${product._id}`}
+                href={`/product/${product.slug}`}
                 className="flex-none w-[240px] sm:w-[260px] snap-start group"
               >
                 <div className="relative w-full h-[340px] rounded overflow-hidden bg-brand-ivory">
@@ -49,9 +49,9 @@ export default function ProductRail() {
                       sizes="260px"
                     />
                   )}
-                  {product.badge && (
-                    <span className="absolute top-3 left-3 bg-brand-black text-brand-gold text-[10px] font-bold uppercase tracking-[1px] px-3 py-1 rounded-full">
-                      {product.badge}
+                  {product.isBundle && (
+                    <span className="absolute top-3 left-3 bg-brand-gold text-brand-navy text-[10px] font-bold uppercase tracking-[1px] px-3 py-1 rounded-full">
+                      Bundle
                     </span>
                   )}
                 </div>
