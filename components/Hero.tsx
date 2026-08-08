@@ -31,13 +31,13 @@ export default function Hero() {
   return (
     <section className="min-h-[90vh] bg-brand-navy flex flex-col md:flex-row overflow-hidden">
       {/* ── Left: copy ── */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 md:py-0 z-10">
-        <span className="inline-flex items-center gap-2 text-brand-gold text-xs font-heading font-bold uppercase tracking-widest mb-6">
-          <span className="w-6 h-px bg-brand-gold" />
-          Ghana&apos;s Home &amp; Office Store
-        </span>
+      <div className="flex-1 flex flex-col justify-center px-5 sm:px-12 lg:px-20 py-12 md:py-0 z-10">
+        {/*<span className="inline-flex items-center gap-2 text-brand-gold text-xs font-heading font-bold uppercase tracking-widest mb-5 sm:mb-6">*/}
+        {/*  <span className="w-6 h-px bg-brand-gold" />*/}
+        {/*  Ghana&apos;s Home &amp; Office Store*/}
+        {/*</span>*/}
 
-        <h1 className="font-heading font-extrabold text-white leading-[1.05] text-5xl sm:text-6xl lg:text-7xl">
+        <h1 className="font-heading font-extrabold text-white leading-[1.05] text-4xl sm:text-6xl lg:text-7xl">
           Everything
           <br />
           Your Space
@@ -50,23 +50,23 @@ export default function Hero() {
           nationwide in 2–4 days.
         </p>
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-6 sm:mt-10 flex flex-wrap gap-3">
           <Link
             href="/shop"
-            className="inline-flex items-center bg-brand-gold text-brand-navy font-heading font-bold px-7 py-3.5 rounded-xl hover:brightness-105 active:scale-95 transition-all text-sm"
+            className="inline-flex items-center bg-brand-gold text-white font-heading font-bold px-7 py-3.5 rounded-xl hover:brightness-105 active:scale-95 transition-all text-sm"
           >
             Shop Now
           </Link>
           <Link
             href="/shop?category=Bundles"
-            className="inline-flex items-center border border-white/20 text-white font-heading font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-colors text-sm"
+            className="inline-flex items-center border border-white/20 text-brand-gold font-heading font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-colors text-sm"
           >
             View Bundles
           </Link>
         </div>
 
         {/* Stats strip */}
-        <div className="mt-14 flex gap-8">
+        <div className="mt-8 sm:mt-14 flex gap-5 sm:gap-8">
           {[
             { value: "500+", label: "Products" },
             { value: "GHS 200", label: "Free delivery" },
@@ -82,7 +82,7 @@ export default function Hero() {
 
       {/* ── Right: image carousel ── */}
       <div
-        className="relative w-full md:w-[48%] lg:w-[52%] min-h-[50vh] md:min-h-full shrink-0 bg-brand-navy/80"
+        className="relative w-full md:w-[48%] lg:w-[52%] min-h-[40vh] md:min-h-full shrink-0 bg-brand-navy/80"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >

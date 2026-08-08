@@ -34,9 +34,9 @@ export default async function ProductPage({ params }: PageProps) {
     <>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Breadcrumb */}
-        <p className="text-sm text-gray-muted font-body mb-8">
+        <p className="text-sm text-gray-muted font-body mb-5 sm:mb-8">
           <Link href="/" className="hover:text-brand-gold transition-colors">Home</Link>
           <span className="mx-2">/</span>
           <Link href={`/shop?category=${product.category}`} className="hover:text-brand-gold transition-colors">

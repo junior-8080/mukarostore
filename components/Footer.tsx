@@ -17,8 +17,8 @@ const CONTACT = [
 export default function Footer() {
   return (
     <footer className="bg-gray-light border-t border-gray-card">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="flex flex-col md:flex-row gap-12 md:gap-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-20">
           <div className="shrink-0 max-w-[240px]">
             <p className="font-heading font-bold text-xl text-brand-navy">MukaroStore</p>
             <p className="text-[10px] text-gray-muted font-body uppercase tracking-widest mt-0.5">
@@ -64,7 +64,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-gray-card flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="mt-8 sm:mt-12 pt-6 border-t border-gray-card flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs font-body text-gray-muted">
             &copy; {new Date().getFullYear()} MukaroStore. All rights reserved.
           </p>

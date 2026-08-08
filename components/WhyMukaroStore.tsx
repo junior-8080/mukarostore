@@ -25,11 +25,11 @@ const FEATURES = [
 
 export default function WhyMukaroStore() {
   return (
-    <section className="bg-white py-20 px-4">
+    <section className="bg-white py-12 sm:py-20 px-4">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="max-w-xl mb-14">
+        <div className="max-w-xl mb-8 sm:mb-14">
           <p className="text-[11px] text-brand-gold font-body uppercase tracking-widest mb-3">
             Why us
           </p>
@@ -43,7 +43,7 @@ export default function WhyMukaroStore() {
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="bg-white p-8 flex flex-col gap-4"
+              className="bg-white p-5 sm:p-8 flex flex-col gap-4"
             >
               <div className="w-10 h-10 rounded-xl bg-gray-light flex items-center justify-center">
                 <Icon size={18} className="text-brand-navy" strokeWidth={1.75} />

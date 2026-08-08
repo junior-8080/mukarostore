@@ -117,7 +117,7 @@ export default function CartPage() {
       <>
         <Navbar />
         <div className="min-h-[70vh] flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl border border-gray-card p-10 max-w-md w-full text-center shadow-lg">
+          <div className="bg-white rounded-2xl border border-gray-card p-6 sm:p-10 max-w-md w-full text-center shadow-lg">
             <div className="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">✅</span>
             </div>
