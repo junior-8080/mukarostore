@@ -31,12 +31,11 @@ export default function Navbar() {
         {/* ── Main bar ── */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
-            {/* Logo */}
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.png"
                 alt="MukaroStore"
-                width={160}
+                width={100}
                 height={44}
                 className="h-11 w-40 object-contain"
                 priority
