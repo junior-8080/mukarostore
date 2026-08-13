@@ -66,13 +66,13 @@ export default async function ProductPage({ params }: PageProps) {
               )}
             </div>
             <div className="grid grid-cols-4 gap-2 mt-3">
-              {[0, 1, 2, 3].map((i) => (
+              {(product.images || []).map((i) => (
                 <div
                   key={i}
                   className="aspect-square rounded-lg bg-gray-card overflow-hidden relative border-2 border-transparent hover:border-brand-gold cursor-pointer transition-colors"
                 >
                   <Image
-                    src={product.images[i] ?? "https://via.placeholder.com/100x100"}
+                    src={product.images[0] ?? "https://via.placeholder.com/100x100"}
                     alt={`${product.name} view ${i + 1}`}
                     fill
                     className="object-cover"
