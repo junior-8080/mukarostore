@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const guard = await requireAdmin(); if (guard) return guard;
   await connectDB();
   const { id } = await params;
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).populate("externalShop", "name");
   if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(product);
 }

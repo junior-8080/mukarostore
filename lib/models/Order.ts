@@ -5,6 +5,12 @@ export interface IOrderItem {
   name: string;
   price: number;
   qty: number;
+  // Snapshot of the owning external shop + MukaroStore's commission at the time this
+  // order was placed, so reconciliation stays accurate even if the product is later
+  // reassigned or deleted. Null for in-house products.
+  externalShopId?: string | null;
+  externalShopName?: string | null;
+  commission?: number | null;
 }
 
 export interface IOrder {
@@ -22,6 +28,8 @@ export interface IOrder {
   paymentMethod: "MoMo" | "Card" | "Bank Transfer";
   promoCode?: string;
   status: "placed" | "processing" | "delivered";
+  // Internal admin notes — never collected from the customer at checkout.
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +43,9 @@ const OrderSchema = new Schema<IOrder>(
         name: { type: String, required: true },
         price: { type: Number, required: true },
         qty: { type: Number, required: true },
+        externalShopId: { type: String, default: null },
+        externalShopName: { type: String, default: null },
+        commission: { type: Number, default: null },
       },
     ],
     subtotal: { type: Number, required: true },
@@ -57,6 +68,7 @@ const OrderSchema = new Schema<IOrder>(
       enum: ["placed", "processing", "delivered"],
       default: "placed",
     },
+    notes: { type: String, default: "" },
   },
   { timestamps: true }
 );

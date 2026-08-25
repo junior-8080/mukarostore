@@ -38,6 +38,8 @@ export default function EditProductPage() {
           bundleContents: product.bundleContents,
           images: product.images,
           popularity: product.popularity,
+          externalShop: product.externalShop?._id ?? "",
+          commission: product.commission ?? undefined,
         }}
       />
     </div>

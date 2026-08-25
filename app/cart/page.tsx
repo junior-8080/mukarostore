@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ProductImage from "@/components/ProductImage";
 import { useCart } from "@/lib/cart-context";
 import { DELIVERY_FEE, DELIVERY_THRESHOLD } from "@/lib/data";
 
@@ -119,7 +120,7 @@ export default function CartPage() {
         <div className="min-h-[70vh] flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl border border-gray-card p-6 sm:p-10 max-w-md w-full text-center shadow-lg">
             <div className="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-4xl">✅</span>
+              <CheckCircle2 size={32} className="text-brand-green" strokeWidth={1.75} />
             </div>
             <h2 className="font-heading font-bold text-2xl text-brand-navy mb-2">
               Order Placed!
@@ -153,7 +154,7 @@ export default function CartPage() {
     <>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 ${items.length > 0 ? "pb-28 lg:pb-10" : ""}`}>
         <h1 className="font-heading font-bold text-3xl text-brand-navy mb-8">
           Your Cart
         </h1>
@@ -186,13 +187,9 @@ export default function CartPage() {
                     }`}
                   >
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-card shrink-0">
-                      <Image
-                        src={
-                          item.product.images[0] ??
-                          "https://via.placeholder.com/80x80"
-                        }
+                      <ProductImage
+                        src={item.product.images[0]}
                         alt={item.product.name}
-                        fill
                         className="object-cover"
                         sizes="80px"
                       />
@@ -214,7 +211,8 @@ export default function CartPage() {
                           onClick={() =>
                             setQty(item.product._id, item.quantity - 1)
                           }
-                          className="px-2 py-1 hover:bg-gray-light text-brand-navy font-bold"
+                          aria-label="Decrease quantity"
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-light text-brand-navy font-bold"
                         >
                           -
                         </button>
@@ -225,7 +223,8 @@ export default function CartPage() {
                           onClick={() =>
                             setQty(item.product._id, item.quantity + 1)
                           }
-                          className="px-2 py-1 hover:bg-gray-light text-brand-navy font-bold"
+                          aria-label="Increase quantity"
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-light text-brand-navy font-bold"
                         >
                           +
                         </button>
@@ -235,7 +234,7 @@ export default function CartPage() {
                       </p>
                       <button
                         onClick={() => remove(item.product._id)}
-                        className="text-red-400 hover:text-red-600 text-xs font-body transition-colors"
+                        className="text-red-400 hover:text-red-600 text-xs font-body transition-colors py-1"
                       >
                         Remove
                       </button>
@@ -449,6 +448,26 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      {/* Sticky mobile total + place order — keeps the primary action reachable
+          without scrolling past the full delivery form on small screens. */}
+      {items.length > 0 && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-card px-4 py-3 flex items-center gap-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-gray-muted font-body uppercase tracking-widest">Total</p>
+            <p className="font-heading font-bold text-brand-navy text-lg leading-tight">
+              GHS {total.toFixed(2)}
+            </p>
+          </div>
+          <button
+            onClick={placeOrder}
+            disabled={!canPlaceOrder || orderState.status === "submitting"}
+            className="bg-brand-gold text-brand-navy font-heading font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+          >
+            {orderState.status === "submitting" ? "Placing…" : "Place Order"}
+          </button>
+        </div>
+      )}
 
       <Footer />
     </>

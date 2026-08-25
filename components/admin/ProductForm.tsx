@@ -12,6 +12,13 @@ function useCategoryOptions() {
   });
 }
 
+function useExternalShopOptions() {
+  return useQuery<{ _id: string; name: string; isActive: boolean }[]>({
+    queryKey: ["admin", "external-shops"],
+    queryFn: () => fetch("/api/admin/external-shops").then((r) => r.json()),
+  });
+}
+
 interface ProductFormProps {
   initialData?: {
     _id?: string;
@@ -23,6 +30,8 @@ interface ProductFormProps {
     bundleContents?: string[];
     images?: string[];
     popularity?: number;
+    externalShop?: string;
+    commission?: number;
   };
 }
 
@@ -31,6 +40,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const qc = useQueryClient();
   const isEdit = !!initialData?._id;
   const { data: categoryOptions = [], isLoading: loadingCategories } = useCategoryOptions();
+  const { data: shopOptions = [] } = useExternalShopOptions();
 
   const [name, setName] = useState(initialData?.name ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "Toiletries");
@@ -42,8 +52,16 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   );
   const [images, setImages] = useState<string[]>(initialData?.images ?? []);
   const [popularity, setPopularity] = useState(String(initialData?.popularity ?? "50"));
+  const [externalShop, setExternalShop] = useState(initialData?.externalShop ?? "");
+  const [commission, setCommission] = useState(
+    initialData?.commission != null ? String(initialData.commission) : ""
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const selectableShops = shopOptions.filter(
+    (s) => s.isActive || s._id === externalShop
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,6 +79,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         : undefined,
       images,
       popularity: parseInt(popularity, 10) || 50,
+      externalShop: externalShop || null,
+      commission: commission.trim() ? parseFloat(commission) : null,
     };
 
     const url = isEdit ? `/api/admin/products/${initialData._id}` : "/api/admin/products";
@@ -201,6 +221,46 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           className={inputCls}
         />
         <p className="text-[10px] text-gray-muted font-body mt-1">Higher = appears first on home page.</p>
+      </div>
+
+      <div className="border-t border-gray-card pt-5">
+        <p className="text-[10px] font-body text-gray-muted uppercase tracking-widest mb-1">Internal only</p>
+        <p className="text-xs text-gray-muted font-body mb-4">
+          Not shown to buyers. Used to track which external shop supplies this product and
+          MukaroStore&apos;s cut — the shop is owed price minus commission per unit sold.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-body text-gray-muted uppercase tracking-widest mb-1.5">
+              External Shop
+            </label>
+            <select
+              value={externalShop}
+              onChange={(e) => setExternalShop(e.target.value)}
+              className={inputCls}
+            >
+              <option value="">— None (in-house) —</option>
+              {selectableShops.map((s) => (
+                <option key={s._id} value={s._id}>{s.name}{!s.isActive ? " (inactive)" : ""}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[10px] font-body text-gray-muted uppercase tracking-widest mb-1.5">
+              Commission (GHS)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={commission}
+              onChange={(e) => setCommission(e.target.value)}
+              disabled={!externalShop}
+              placeholder="Your cut per unit"
+              className={inputCls + " disabled:opacity-50"}
+            />
+          </div>
+        </div>
       </div>
 
       {error && (

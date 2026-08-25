@@ -11,6 +11,10 @@ export interface IProduct {
   bundleContents?: string[];
   images: string[];
   popularity: number;
+  // Internal only — the external shop that owns/supplies this product, and MukaroStore's
+  // cut per unit sold (the shop is owed price − commission). Never expose to buyers.
+  externalShop?: mongoose.Types.ObjectId | null;
+  commission?: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,6 +30,8 @@ const ProductSchema = new Schema<IProduct>(
     bundleContents: { type: [String], default: undefined },
     images: { type: [String], default: [] },
     popularity: { type: Number, default: 50 },
+    externalShop: { type: Schema.Types.ObjectId, ref: "ExternalShop", default: null },
+    commission: { type: Number, default: null },
   },
   { timestamps: true }
 );

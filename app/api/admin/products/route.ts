@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const query: Record<string, unknown> = {};
   if (category) query.category = category;
   if (search) query.name = { $regex: search, $options: "i" };
-  const products = await Product.find(query).sort({ createdAt: -1 });
+  const products = await Product.find(query).sort({ createdAt: -1 }).populate("externalShop", "name");
   return NextResponse.json(products);
 }
 

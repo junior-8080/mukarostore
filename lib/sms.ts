@@ -30,14 +30,14 @@ export async function sendSms(phoneNumber: string, message: string) {
   return res.json();
 }
 
-export type OrderSmsEvent = "placed" | "confirmed" | "shipped" | "delivered" | "cancelled";
+export type OrderSmsEvent = "placed" | "processing" | "delivered";
 
 export function buildOrderSms(
   event: OrderSmsEvent,
-  params: { name: string; orderNumber: string; total: number; currency: string }
+  params: { name: string; orderNumber: string; total: number }
 ) {
-  const { name, orderNumber, total, currency } = params;
-  const amount = `${currency} ${total.toLocaleString()}`;
+  const { name, orderNumber, total } = params;
+  const amount = `GHS ${total.toLocaleString()}`;
 
   switch (event) {
     case "placed":
@@ -45,25 +45,15 @@ export function buildOrderSms(
         `Hi ${name}, we have received your Sutura by Feesah order ${orderNumber}. ` +
         `Total: ${amount}. We will contact you shortly to confirm. Thank you for shopping with us!`
       );
-    case "confirmed":
+    case "processing":
       return (
-        `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been CONFIRMED! ` +
+        `Hi ${name}, your Sutura by Feesah order ${orderNumber} is being processed! ` +
         `Total: ${amount}. We will contact you shortly to arrange delivery. Thank you for shopping with us!`
-      );
-    case "shipped":
-      return (
-        `Hi ${name}, your Sutura by Feesah order ${orderNumber} is on its way! ` +
-        `We will contact you on delivery. Thank you for shopping with us!`
       );
     case "delivered":
       return (
         `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been delivered. ` +
         `We hope you love it! Thank you for shopping with us!`
-      );
-    case "cancelled":
-      return (
-        `Hi ${name}, your Sutura by Feesah order ${orderNumber} has been cancelled. ` +
-        `If this was a mistake or you have questions, please contact us.`
       );
   }
 }

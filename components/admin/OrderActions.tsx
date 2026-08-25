@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useUpdateOrder } from "@/lib/hooks/use-admin-orders";
 
-const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"] as const;
+const STATUSES = ["placed", "processing", "delivered"] as const;
 type Status = typeof STATUSES[number];
 
 type Toast = { type: "success" | "error"; message: string };

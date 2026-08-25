@@ -76,6 +76,9 @@ function ProductsContent() {
                   {p.isBundle && (
                     <span className="inline-block mt-1 text-[10px] bg-brand-gold/10 text-brand-gold px-2 py-0.5 font-body font-medium">Bundle</span>
                   )}
+                  {p.externalShop && (
+                    <p className="text-[10px] text-gray-muted font-body mt-1">Shop: {p.externalShop.name}</p>
+                  )}
                   <div className="flex items-center gap-3 mt-2">
                     <Link href={`/admin/products/${p._id}/edit`} className="text-xs font-body text-brand-gold hover:underline">Edit</Link>
                     <DeleteProductButton id={p._id} name={p.name} />
@@ -91,7 +94,7 @@ function ProductsContent() {
               <table className="w-full text-sm min-w-[640px]">
                 <thead>
                   <tr className="border-b border-gray-card">
-                    {["Image", "Name", "Category", "Price", "Type", "Actions"].map((h) => (
+                    {["Image", "Name", "Category", "Price", "Type", "Shop", "Actions"].map((h) => (
                       <th key={h} className="text-left px-5 py-3 text-[10px] font-body text-gray-muted uppercase tracking-widest whitespace-nowrap">
                         {h}
                       </th>
@@ -119,6 +122,9 @@ function ProductsContent() {
                         ) : (
                           <span className="text-[10px] bg-gray-light text-gray-muted px-2 py-0.5 font-body">Single</span>
                         )}
+                      </td>
+                      <td className="px-5 py-3 font-body text-gray-muted text-xs whitespace-nowrap">
+                        {p.externalShop?.name ?? "—"}
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">

@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 import { connectDB } from "@/lib/mongodb";
 import { Order } from "@/lib/models/Order";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import OrderActions from "@/components/admin/OrderActions";
@@ -12,10 +11,39 @@ async function getOrder(id: string) {
   return Order.findById(id).lean();
 }
 
+interface DetailItem {
+  productId: string;
+  name: string;
+  qty: number;
+  price: number;
+  externalShopId?: string | null;
+  externalShopName?: string | null;
+  commission?: number | null;
+}
+
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const order = await getOrder(id);
   if (!order) notFound();
+
+  const items = order.items as DetailItem[];
+
+  // Amount owed to each external shop: (sale price − MukaroStore's commission) × qty,
+  // using the shop/commission snapshot captured at checkout time. In-house items are excluded.
+  const payoutsByShop = new Map<string, { shop: string; units: number; owed: number }>();
+  for (const item of items) {
+    if (!item.externalShopName) continue;
+    const key = item.externalShopId ?? item.externalShopName;
+    const owed = (item.price - (item.commission ?? 0)) * item.qty;
+    const existing = payoutsByShop.get(key);
+    if (existing) {
+      existing.units += item.qty;
+      existing.owed += owed;
+    } else {
+      payoutsByShop.set(key, { shop: item.externalShopName, units: item.qty, owed });
+    }
+  }
+  const payouts = Array.from(payoutsByShop.values());
 
   return (
     <div className="max-w-2xl">
@@ -41,8 +69,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div><p className="text-black/50 text-xs mb-0.5">Name</p><p className="font-medium">{order.customer.name}</p></div>
           <div><p className="text-black/50 text-xs mb-0.5">Phone</p><p>{order.customer.phone}</p></div>
-          <div><p className="text-black/50 text-xs mb-0.5">Email</p><p className="break-all">{order.customer.email || "—"}</p></div>
-          <div><p className="text-black/50 text-xs mb-0.5">Address</p><p>{order.customer.address}</p></div>
+          <div className="sm:col-span-2"><p className="text-black/50 text-xs mb-0.5">GPS Address</p><p>{order.customer.gpsAddress}</p></div>
+          <div><p className="text-black/50 text-xs mb-0.5">Payment Method</p><p>{order.paymentMethod}</p></div>
+          {order.promoCode && (
+            <div><p className="text-black/50 text-xs mb-0.5">Promo Code</p><p>{order.promoCode}</p></div>
+          )}
         </div>
       </div>
 
@@ -50,18 +81,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="bg-white rounded-xl border border-[#CDCAC3] p-4 sm:p-5 mb-4">
         <h2 className="font-semibold text-black mb-3">Items</h2>
         <div className="space-y-3">
-          {(order.items as Array<{ image: string; name: string; qty: number; price: number }>).map((item, i) => (
+          {items.map((item, i) => (
             <div key={i} className="flex items-center gap-3">
-              {item.image ? (
-                <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0 bg-[#CDCAC3]">
-                  <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
-                </div>
-              ) : (
-                <div className="w-12 h-12 rounded-lg bg-[#CDCAC3] flex-shrink-0" />
-              )}
+              <div className="w-12 h-12 rounded-lg bg-[#CDCAC3] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-black line-clamp-1">{item.name}</p>
-                <p className="text-xs text-black/50">Qty: {item.qty}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-black/50">Qty: {item.qty}</p>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                      item.externalShopName ? "bg-amber-50 text-amber-700" : "bg-black/5 text-black/40"
+                    }`}
+                  >
+                    {item.externalShopName ?? "In-house"}
+                  </span>
+                </div>
               </div>
               <p className="text-sm font-semibold text-black shrink-0">
                 ₵{(item.price * item.qty).toLocaleString()}
@@ -71,9 +105,27 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </div>
         <div className="border-t border-[#CDCAC3] mt-4 pt-4 flex justify-between font-semibold text-black">
           <span>Total</span>
-          <span>₵{order.total.toLocaleString()} {order.currency}</span>
+          <span>₵{order.total.toLocaleString()}</span>
         </div>
       </div>
+
+      {/* External shop payouts — internal reconciliation only, never shown to buyers */}
+      {payouts.length > 0 && (
+        <div className="bg-white rounded-xl border border-[#CDCAC3] p-4 sm:p-5 mb-4">
+          <h2 className="font-semibold text-black mb-3">External Shop Payouts</h2>
+          <div className="space-y-2.5">
+            {payouts.map((p) => (
+              <div key={p.shop} className="flex items-center justify-between text-sm">
+                <div>
+                  <p className="font-medium text-black">{p.shop}</p>
+                  <p className="text-xs text-black/50">{p.units} unit{p.units !== 1 ? "s" : ""}</p>
+                </div>
+                <p className="font-semibold text-black">₵{p.owed.toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Status + notes — client component */}
       <OrderActions

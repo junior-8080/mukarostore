@@ -13,6 +13,11 @@ const STATUS_COLORS: Record<string, string> = {
 
 const STATUSES = ["all", "placed", "processing", "delivered"];
 
+function shopSummary(items: { externalShopName?: string | null }[]) {
+  const names = Array.from(new Set(items.map((i) => i.externalShopName).filter(Boolean))) as string[];
+  return names.length ? names.join(", ") : "In-house";
+}
+
 function OrdersContent() {
   const searchParams = useSearchParams();
   const status = searchParams.get("status") ?? undefined;
@@ -65,6 +70,7 @@ function OrdersContent() {
                 </div>
                 <p className="font-heading font-semibold text-brand-navy text-sm">{order.customer.name}</p>
                 <p className="text-xs font-body text-gray-muted mt-0.5">{order.customer.phone}</p>
+                <p className="text-xs font-body text-gray-muted mt-0.5">Shop: {shopSummary(order.items)}</p>
                 <div className="flex items-center justify-between mt-3">
                   <p className="font-heading font-bold text-brand-navy">₵{order.total.toLocaleString()}</p>
                   <p className="text-xs text-gray-muted font-body">
@@ -87,7 +93,7 @@ function OrdersContent() {
               <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="border-b border-gray-card">
-                    {["Order #", "Customer", "Phone", "Items", "Total", "Status", "Date", ""].map((h, i) => (
+                    {["Order #", "Customer", "Phone", "Items", "Shop", "Total", "Status", "Date", ""].map((h, i) => (
                       <th key={i} className="text-left px-5 py-3 text-[10px] font-body text-gray-muted uppercase tracking-widest whitespace-nowrap">
                         {h}
                       </th>
@@ -101,6 +107,9 @@ function OrdersContent() {
                       <td className="px-5 py-4 font-body font-medium text-brand-navy whitespace-nowrap">{order.customer.name}</td>
                       <td className="px-5 py-4 font-body text-gray-muted whitespace-nowrap">{order.customer.phone}</td>
                       <td className="px-5 py-4 font-body text-gray-muted">{order.items.length}</td>
+                      <td className="px-5 py-4 font-body text-gray-muted text-xs max-w-[160px] truncate" title={shopSummary(order.items)}>
+                        {shopSummary(order.items)}
+                      </td>
                       <td className="px-5 py-4 font-heading font-semibold text-brand-navy whitespace-nowrap">₵{order.total.toLocaleString()}</td>
                       <td className="px-5 py-4">
                         <span className={`text-[10px] px-2 py-0.5 font-body font-medium capitalize whitespace-nowrap ${STATUS_COLORS[order.status] ?? "bg-gray-card text-gray-muted"}`}>

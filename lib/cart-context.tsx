@@ -112,7 +112,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         items,
-        add: (product) => dispatch({ type: "ADD", product }),
+        add: (product) => {
+          dispatch({ type: "ADD", product });
+          setCartOpen(true);
+        },
         remove: (id) => dispatch({ type: "REMOVE", id }),
         setQty: (id, quantity) => dispatch({ type: "SET_QTY", id, quantity }),
         clear: () => dispatch({ type: "CLEAR" }),

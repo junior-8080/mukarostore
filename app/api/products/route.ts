@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
   const total = await ProductModel.countDocuments(query);
   const totalPages = Math.ceil(total / limit);
   const products = await ProductModel.find(query)
+    .select("-externalShop -commission")
     .sort(sortOption)
     .skip((page - 1) * limit)
     .limit(limit)

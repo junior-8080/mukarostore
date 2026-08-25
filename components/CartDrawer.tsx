@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import ProductImage from "@/components/ProductImage";
 
 export default function CartDrawer() {
   const { items, remove, setQty, subtotal, count, cartOpen, setCartOpen } =
@@ -77,10 +77,9 @@ export default function CartDrawer() {
                   >
                     {/* Thumbnail */}
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-card">
-                      <Image
-                        src={item.product.images[0] ?? "https://via.placeholder.com/80x80"}
+                      <ProductImage
+                        src={item.product.images[0]}
                         alt={item.product.name}
-                        fill
                         sizes="80px"
                         className="object-cover"
                       />
@@ -104,9 +103,10 @@ export default function CartDrawer() {
                             onClick={() =>
                               setQty(item.product._id, item.quantity - 1)
                             }
-                            className="w-6 h-6 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
+                            aria-label="Decrease quantity"
+                            className="w-7 h-7 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
                           >
-                            <Minus size={11} />
+                            <Minus size={12} />
                           </button>
                           <span className="text-sm font-medium w-4 text-center text-brand-navy">
                             {item.quantity}
@@ -115,9 +115,10 @@ export default function CartDrawer() {
                             onClick={() =>
                               setQty(item.product._id, item.quantity + 1)
                             }
-                            className="w-6 h-6 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
+                            aria-label="Increase quantity"
+                            className="w-7 h-7 rounded-full border border-gray-card flex items-center justify-center hover:bg-white transition-colors"
                           >
-                            <Plus size={11} />
+                            <Plus size={12} />
                           </button>
                         </div>
 
@@ -127,7 +128,8 @@ export default function CartDrawer() {
                           </span>
                           <button
                             onClick={() => remove(item.product._id)}
-                            className="text-gray-muted hover:text-red-400 transition-colors"
+                            aria-label={`Remove ${item.product.name}`}
+                            className="p-1.5 -m-1.5 text-gray-muted hover:text-red-400 transition-colors"
                           >
                             <Trash2 size={14} />
                           </button>

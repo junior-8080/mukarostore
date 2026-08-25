@@ -11,6 +11,8 @@ export interface AdminProduct {
   bundleContents?: string[];
   images: string[];
   popularity: number;
+  externalShop?: { _id: string; name: string } | null;
+  commission?: number | null;
 }
 
 export function useAdminProducts(params: { search?: string } = {}) {

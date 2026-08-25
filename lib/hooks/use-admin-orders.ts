@@ -3,11 +3,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export interface AdminOrder {
   _id: string;
   orderNumber: string;
-  customer: { name: string; email: string; phone: string; address: string };
-  items: { productId: string; name: string; price: number; qty: number; image: string }[];
+  customer: { name: string; phone: string; gpsAddress: string };
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    qty: number;
+    externalShopId?: string | null;
+    externalShopName?: string | null;
+    commission?: number | null;
+  }[];
   total: number;
-  currency: string;
-  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  paymentMethod: "MoMo" | "Card" | "Bank Transfer";
+  promoCode?: string;
+  status: "placed" | "processing" | "delivered";
   notes?: string;
   createdAt: string;
 }
@@ -29,7 +38,13 @@ export interface SmsResult {
 export function useUpdateOrder() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: { status: string; notes: string } }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { status: "placed" | "processing" | "delivered"; notes: string };
+    }) => {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import ProductImage from "@/components/ProductImage";
 import type { Product } from "@/lib/data";
 
 type Props = {
@@ -20,10 +20,9 @@ export default function ProductCard({ product }: Props) {
         href={`/product/${product.slug}`}
         className="relative block aspect-square overflow-hidden bg-gray-light"
       >
-        <Image
-          src={product.images[0] ?? "https://via.placeholder.com/400x400"}
+        <ProductImage
+          src={product.images[0]}
           alt={product.name}
-          fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
@@ -53,7 +52,7 @@ export default function ProductCard({ product }: Props) {
           <button
             onClick={() => add(product)}
             aria-label={`Add ${product.name} to cart`}
-            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-brand-navy hover:brightness-105 active:scale-90 transition-all duration-150"
+            className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-full text-brand-navy hover:brightness-105 active:scale-90 transition-all duration-150"
           >
             <ShoppingCart size={15} strokeWidth={2.5} />
           </button>

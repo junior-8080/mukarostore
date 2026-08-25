@@ -41,16 +41,22 @@ export async function POST(req: NextRequest) {
 
   // Re-fetch prices from DB (server is source of truth)
   const productIds = items.map((i) => i.productId);
-  const products = await ProductModel.find({ _id: { $in: productIds } }).lean();
+  const products = await ProductModel.find({ _id: { $in: productIds } })
+    .populate("externalShop", "name")
+    .lean();
 
   const orderItems = items.map((item) => {
     const product = products.find((p) => String(p._id) === item.productId);
     if (!product) throw new Error(`Product ${item.productId} not found`);
+    const shop = product.externalShop as unknown as { _id: unknown; name: string } | null;
     return {
       productId: item.productId,
       name: product.name,
       price: product.price,
       qty: item.qty,
+      externalShopId: shop ? String(shop._id) : null,
+      externalShopName: shop ? shop.name : null,
+      commission: product.commission ?? null,
     };
   });
 

@@ -1,9 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Truck, Zap, MapPin, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductGrid from "@/components/ProductGrid";
+import ProductGallery from "@/components/ProductGallery";
 import AddToCartSection from "@/components/AddToCartSection";
 import type { Product } from "@/lib/data";
 
@@ -48,41 +49,11 @@ export default async function ProductPage({ params }: PageProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
           {/* Left: Image */}
-          <div>
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-card">
-              <Image
-                src={product.images[0] ?? "https://via.placeholder.com/400x400"}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                unoptimized
-              />
-              {product.isBundle && (
-                <span className="absolute top-4 left-4 bg-brand-gold text-brand-navy text-xs font-heading font-bold px-3 py-1 rounded-full uppercase">
-                  Bundle
-                </span>
-              )}
-            </div>
-            <div className="grid grid-cols-4 gap-2 mt-3">
-              {(product.images || []).map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-lg bg-gray-card overflow-hidden relative border-2 border-transparent hover:border-brand-gold cursor-pointer transition-colors"
-                >
-                  <Image
-                    src={product.images[0] ?? "https://via.placeholder.com/100x100"}
-                    alt={`${product.name} view ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="10vw"
-                    unoptimized
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ProductGallery
+            images={product.images || []}
+            name={product.name}
+            badge={product.isBundle ? "Bundle" : undefined}
+          />
 
           {/* Right: Details */}
           <div className="flex flex-col gap-5">
@@ -102,7 +73,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <ul className="space-y-1">
                   {product.bundleContents.map((item) => (
                     <li key={item} className="flex items-center gap-2 text-brand-navy font-body text-sm">
-                      <span className="text-brand-gold font-bold">✓</span>
+                      <Check size={14} strokeWidth={3} className="text-brand-gold shrink-0" />
                       {item}
                     </li>
                   ))}
@@ -112,10 +83,19 @@ export default async function ProductPage({ params }: PageProps) {
 
             <AddToCartSection product={product} />
 
-            <div className="bg-gray-light rounded-lg p-4 text-sm font-body text-gray-muted space-y-1">
-              <p>📦 <strong>Free delivery</strong> on orders over GHS 200</p>
-              <p>🚀 Same-day delivery in Accra</p>
-              <p>🇬🇭 2-4 days nationwide via Ghana Post GPS</p>
+            <div className="bg-gray-light rounded-lg p-4 text-sm font-body text-gray-muted space-y-2">
+              <p className="flex items-center gap-2">
+                <Truck size={15} className="text-brand-gold shrink-0" />
+                <span><strong className="text-brand-navy">Free delivery</strong> on orders over GHS 200</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Zap size={15} className="text-brand-gold shrink-0" />
+                Same-day delivery in Accra
+              </p>
+              <p className="flex items-center gap-2">
+                <MapPin size={15} className="text-brand-gold shrink-0" />
+                2-4 days nationwide via Ghana Post GPS
+              </p>
             </div>
 
             <div className="flex gap-2 flex-wrap">

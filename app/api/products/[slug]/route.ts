@@ -13,7 +13,7 @@ export async function GET(
   // Support both slug-based lookup and legacy ID-based lookup
   let product;
   if (Types.ObjectId.isValid(slug)) {
-    product = await ProductModel.findById(slug).lean();
+    product = await ProductModel.findById(slug).select("-externalShop -commission").lean();
     if (product) {
       // Legacy ID lookup — return product directly (no related)
       return NextResponse.json(product, {
@@ -22,7 +22,7 @@ export async function GET(
     }
   }
 
-  product = await ProductModel.findOne({ slug }).lean();
+  product = await ProductModel.findOne({ slug }).select("-externalShop -commission").lean();
   if (!product) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -31,6 +31,7 @@ export async function GET(
     category: product.category,
     slug: { $ne: slug },
   })
+    .select("-externalShop -commission")
     .sort({ popularity: -1 })
     .limit(4)
     .lean();

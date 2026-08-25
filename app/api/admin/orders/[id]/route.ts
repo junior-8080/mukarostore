@@ -26,15 +26,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const statusChanged = previous.status !== order.status;
-  const notifiable = order.status !== "pending";
-  const smsQueued = statusChanged && notifiable && Boolean(order.customer.phone);
+  const smsQueued = statusChanged && Boolean(order.customer.phone);
 
   if (smsQueued) {
     const message = buildOrderSms(order.status as OrderSmsEvent, {
       name: order.customer.name,
       orderNumber: order.orderNumber,
       total: order.total,
-      currency: order.currency,
     });
 
     after(async () => {

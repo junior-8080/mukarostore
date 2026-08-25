@@ -10,7 +10,7 @@ async function getProduct(id: string): Promise<IProduct | null> {
   if (!Types.ObjectId.isValid(id)) return null;
   try {
     await connectDB();
-    return await Product.findById(id).lean<IProduct>();
+    return await Product.findById(id).select("-externalShop -commission").lean<IProduct>();
   } catch {
     return null;
   }
