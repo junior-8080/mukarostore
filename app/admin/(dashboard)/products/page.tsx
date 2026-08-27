@@ -82,7 +82,7 @@ function ProductsContent() {
                   )}
                   <div className="flex items-center gap-3 mt-2">
                     <Link href={`/admin/products/${p._id}/edit`} className="text-xs font-body text-brand-gold hover:underline">Edit</Link>
-                    <ShareProductButton slug={p.slug} name={p.name} price={p.price} />
+                    <ShareProductButton slug={p.slug} name={p.name} price={p.price} image={p.images[0]} />
                     <DeleteProductButton id={p._id} name={p.name} />
                   </div>
                 </div>
@@ -131,7 +131,7 @@ function ProductsContent() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <Link href={`/admin/products/${p._id}/edit`} className="text-xs font-body text-brand-gold hover:underline">Edit</Link>
-                          <ShareProductButton slug={p.slug} name={p.name} price={p.price} />
+                          <ShareProductButton slug={p.slug} name={p.name} price={p.price} image={p.images[0]} />
                           <DeleteProductButton id={p._id} name={p.name} />
                         </div>
                       </td>
