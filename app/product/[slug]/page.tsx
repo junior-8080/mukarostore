@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { Truck, Zap, MapPin, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -22,6 +23,36 @@ async function getProduct(slug: string): Promise<{ product: Product; related: Pr
   } catch {
     return null;
   }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await getProduct(slug);
+  if (!data) return {};
+
+  const { product } = data;
+  const title = product.name;
+  const description = product.description || `${product.name} — GHS ${product.price} at MukaroStore.`;
+  const image = product.images?.[0];
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/product/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/product/${slug}`,
+      type: "website",
+      images: image ? [{ url: image, width: 1200, height: 1200, alt: product.name }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
 }
 
 export default async function ProductPage({ params }: PageProps) {

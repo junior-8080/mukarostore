@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "MukaroStore — Home & Office Essentials, Accra",
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     title: "MukaroStore — Home & Office Essentials | Accra, Ghana",
     description:
       "Quality home and office essentials for homes, offices, and institutions across Ghana. Fast delivery. No drama.",
-    images: ["/og-image.jpg"],
+    images: ["/logo.png"],
   },
 };
 
