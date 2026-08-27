@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAdminProducts } from "@/lib/hooks/use-admin-products";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import ShareProductButton from "@/components/admin/ShareProductButton";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -81,6 +82,7 @@ function ProductsContent() {
                   )}
                   <div className="flex items-center gap-3 mt-2">
                     <Link href={`/admin/products/${p._id}/edit`} className="text-xs font-body text-brand-gold hover:underline">Edit</Link>
+                    <ShareProductButton slug={p.slug} name={p.name} price={p.price} />
                     <DeleteProductButton id={p._id} name={p.name} />
                   </div>
                 </div>
@@ -129,6 +131,7 @@ function ProductsContent() {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <Link href={`/admin/products/${p._id}/edit`} className="text-xs font-body text-brand-gold hover:underline">Edit</Link>
+                          <ShareProductButton slug={p.slug} name={p.name} price={p.price} />
                           <DeleteProductButton id={p._id} name={p.name} />
                         </div>
                       </td>

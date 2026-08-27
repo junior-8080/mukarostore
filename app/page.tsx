@@ -104,9 +104,6 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="bg-brand-navy flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 px-6 py-8 sm:px-10 sm:py-10">
             <div>
-              <p className="text-[11px] text-brand-gold font-body uppercase tracking-widest mb-2">
-                500+ products
-              </p>
               <h3 className="font-heading font-bold text-white text-xl sm:text-2xl leading-snug">
                 There&apos;s a lot more<br className="hidden sm:block" /> where that came from.
               </h3>
