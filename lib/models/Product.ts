@@ -1,4 +1,5 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import "@/lib/models/ExternalShop";
 
 export interface IProduct {
   _id: mongoose.Types.ObjectId;
