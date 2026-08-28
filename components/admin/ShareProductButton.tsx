@@ -14,6 +14,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+function isMobileDevice(): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function truncateToWidth(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (ctx.measureText(text).width <= maxWidth) return text;
   let s = text;
@@ -100,7 +104,12 @@ export default function ShareProductButton({
     const summary = `${name} — ₵${price.toLocaleString()}`;
     const text = `${summary}\n${url}`;
 
-    if (typeof navigator.share === "function") {
+    // The desktop OS share sheet (Mac/Windows) hands shared files off to
+    // whatever target the user picks, and targets like WhatsApp Desktop
+    // don't consume them properly — they just paste the temp file's local
+    // path as text. So file-based sharing is mobile-only; desktop downloads
+    // the branded image instead and opens WhatsApp Web with the caption ready.
+    if (isMobileDevice() && typeof navigator.share === "function") {
       if (image) {
         setLoading(true);
         const file = await buildShareImage(image, name, price, url);
@@ -124,7 +133,20 @@ export default function ShareProductButton({
       return;
     }
 
-    // Desktop fallback: open WhatsApp's share dialog and copy the message
+    if (image) {
+      setLoading(true);
+      const file = await buildShareImage(image, name, price, url);
+      setLoading(false);
+      if (file) {
+        const objectUrl = URL.createObjectURL(file);
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = `${slug}.jpg`;
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     try {
       await navigator.clipboard.writeText(text);
