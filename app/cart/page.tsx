@@ -9,7 +9,7 @@ import ProductImage from "@/components/ProductImage";
 import { useCart } from "@/lib/cart-context";
 import { DELIVERY_FEE, DELIVERY_THRESHOLD } from "@/lib/data";
 
-type PaymentMethod = "MoMo" | "Card" | "Bank Transfer";
+type PaymentMethod = "MoMo";
 
 const MOMO_MERCHANT_ID = "292231";
 const MOMO_MERCHANT_NAME = "MUKAROCORE ENTERPRISE";

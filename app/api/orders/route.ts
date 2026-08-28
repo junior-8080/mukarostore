@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     items: { productId: string; qty: number }[];
     customer: { name: string; phone: string; gpsAddress: string };
-    paymentMethod: "MoMo" | "Card" | "Bank Transfer";
+    paymentMethod: "MoMo";
     promoCode?: string;
   };
 

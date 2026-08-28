@@ -14,7 +14,7 @@ export interface AdminOrder {
     commission?: number | null;
   }[];
   total: number;
-  paymentMethod: "MoMo" | "Card" | "Bank Transfer";
+  paymentMethod: "MoMo";
   promoCode?: string;
   status: "placed" | "processing" | "delivered";
   notes?: string;

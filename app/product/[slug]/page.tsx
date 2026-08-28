@@ -130,11 +130,9 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
 
             <div className="flex gap-2 flex-wrap">
-              {["MoMo", "Telecel Cash", "Bank Card"].map((method) => (
-                <span key={method} className="border border-gray-card text-gray-muted text-xs font-body px-3 py-1 rounded-full">
-                  {method}
-                </span>
-              ))}
+              <span className="border border-gray-card text-gray-muted text-xs font-body px-3 py-1 rounded-full">
+                MTN MoMo
+              </span>
             </div>
           </div>
         </div>

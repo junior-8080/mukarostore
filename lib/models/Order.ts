@@ -25,7 +25,7 @@ export interface IOrder {
     phone: string;
     gpsAddress: string;
   };
-  paymentMethod: "MoMo" | "Card" | "Bank Transfer";
+  paymentMethod: "MoMo";
   promoCode?: string;
   status: "placed" | "processing" | "delivered";
   // Internal admin notes — never collected from the customer at checkout.
@@ -59,7 +59,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     paymentMethod: {
       type: String,
-      enum: ["MoMo", "Card", "Bank Transfer"],
+      enum: ["MoMo"],
       required: true,
     },
     promoCode: { type: String },

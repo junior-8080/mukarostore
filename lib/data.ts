@@ -26,7 +26,7 @@ export type Order = {
   discount: number;
   total: number;
   customer: { name: string; phone: string; gpsAddress: string };
-  paymentMethod: "MoMo" | "Card" | "Bank Transfer";
+  paymentMethod: "MoMo";
   promoCode?: string;
   status: "placed" | "processing" | "delivered";
   createdAt: string;
