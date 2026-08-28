@@ -9,8 +9,9 @@ const NAV = [
 ];
 
 const CONTACT = [
-  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/233200000000" },
-  { icon: Phone,         label: "+233 20 000 0000", href: "tel:+233200000000" },
+  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/233545543359" },
+  { icon: Phone,         label: "054 554 3359", href: "tel:+233545543359" },
+  { icon: Phone,         label: "024 058 0387", href: "tel:+233240580387" },
   { icon: Mail,          label: "info@mukarocore.com", href: "mailto:info@mukarocore.com" },
 ];
 

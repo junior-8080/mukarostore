@@ -54,7 +54,7 @@ const FAQS = [
     items: [
       {
         q: "What payment methods do you accept?",
-        a: "We accept MTN MoMo, Telecel Cash, and bank card payments. Select your preferred method at checkout.",
+        a: "We currently accept MTN Mobile Money (MoMo) only. You'll get the merchant payment steps at checkout.",
       },
       {
         q: "Is it safe to pay on MukaroStore?",
@@ -85,7 +85,7 @@ const FAQS = [
   },
 ];
 
-const WHATSAPP_NUMBER = "233200000000";
+const WHATSAPP_NUMBER = "233545543359";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20MukaroStore%2C%20I%20have%20a%20question%20about%20my%20order.`;
 
 function FAQItem({ q, a }: { q: string; a: string }) {

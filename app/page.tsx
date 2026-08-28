@@ -22,7 +22,7 @@ const jsonLd = {
         "Ghana-based home and office essentials store. Quality toiletries, plastics, cleaning supplies, and office products delivered fast across Accra and nationwide.",
       url: siteUrl,
       logo: `${siteUrl}/logo.png`,
-      telephone: "+233200000000",
+      telephone: "+233545543359",
       email: "info@mukarocore.com",
       address: {
         "@type": "PostalAddress",

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, Smartphone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductImage from "@/components/ProductImage";
@@ -10,6 +10,9 @@ import { useCart } from "@/lib/cart-context";
 import { DELIVERY_FEE, DELIVERY_THRESHOLD } from "@/lib/data";
 
 type PaymentMethod = "MoMo" | "Card" | "Bank Transfer";
+
+const MOMO_MERCHANT_ID = "292231";
+const MOMO_MERCHANT_NAME = "MUKAROCORE ENTERPRISE";
 
 type CustomerForm = {
   name: string;
@@ -37,7 +40,8 @@ export default function CartPage() {
     phone: "",
     gpsAddress: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("MoMo");
+  const [paymentMethod] = useState<PaymentMethod>("MoMo");
+  const [showMomoInstructions, setShowMomoInstructions] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoState, setPromoState] = useState<PromoState>({ status: "idle" });
   const [orderState, setOrderState] = useState<OrderState>({ status: "idle" });
@@ -134,6 +138,24 @@ export default function CartPage() {
                 {orderState.orderNumber}
               </p>
             </div>
+
+            <div className="bg-gray-light rounded-lg p-4 mb-6 text-left">
+              <p className="font-heading font-semibold text-brand-navy text-sm mb-2 flex items-center gap-2">
+                <Smartphone size={16} className="text-brand-gold shrink-0" />
+                Pay via MTN Mobile Money
+              </p>
+              <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-muted font-body">
+                <li>Dial <strong className="text-brand-navy">*170#</strong> on your MTN line</li>
+                <li>Select <strong className="text-brand-navy">Pay Bill</strong> (or <strong className="text-brand-navy">Pay Merchant</strong>)</li>
+                <li>Enter Merchant ID <strong className="text-brand-navy">{MOMO_MERCHANT_ID}</strong></li>
+                <li>Confirm the merchant name shows <strong className="text-brand-navy">{MOMO_MERCHANT_NAME}</strong></li>
+                <li>Enter <strong className="text-brand-navy">GHS {total.toFixed(2)}</strong> and proceed</li>
+              </ol>
+              <p className="text-xs text-gray-muted font-body mt-3">
+                Keep your SMS receipt as proof of payment — we&apos;ll confirm your order once payment is verified.
+              </p>
+            </div>
+
             <p className="text-gray-muted font-body text-sm mb-6">
               We&apos;ll reach out via WhatsApp or call to confirm delivery.
             </p>
@@ -306,32 +328,41 @@ export default function CartPage() {
                 <h2 className="font-heading font-bold text-brand-navy text-lg mb-4">
                   Payment Method
                 </h2>
-                <div className="flex flex-wrap gap-3">
-                  {(["MoMo", "Card", "Bank Transfer"] as PaymentMethod[]).map(
-                    (method) => (
-                      <label
-                        key={method}
-                        className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                          paymentMethod === method
-                            ? "border-brand-gold bg-brand-gold/10"
-                            : "border-gray-card hover:border-brand-gold/50"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value={method}
-                          checked={paymentMethod === method}
-                          onChange={() => setPaymentMethod(method)}
-                          className="accent-brand-gold"
-                        />
-                        <span className="font-heading font-semibold text-brand-navy text-sm">
-                          {method}
-                        </span>
-                      </label>
-                    )
-                  )}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMomoInstructions((v) => !v)}
+                  aria-expanded={showMomoInstructions}
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg border-2 border-brand-gold bg-brand-gold/10 text-left transition-colors"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Smartphone size={18} className="text-brand-gold shrink-0" />
+                    <span className="font-heading font-semibold text-brand-navy text-sm">
+                      MTN Mobile Money (MoMo)
+                    </span>
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    className={`text-brand-navy shrink-0 transition-transform ${showMomoInstructions ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {showMomoInstructions && (
+                  <div className="mt-3 bg-gray-light rounded-lg p-4 text-sm font-body">
+                    <p className="font-heading font-semibold text-brand-navy mb-2">
+                      How to pay
+                    </p>
+                    <ol className="list-decimal list-inside space-y-1.5 text-gray-muted">
+                      <li>Dial <strong className="text-brand-navy">*170#</strong> on your MTN line</li>
+                      <li>Select <strong className="text-brand-navy">Pay Bill</strong> (or <strong className="text-brand-navy">Pay Merchant</strong>)</li>
+                      <li>Enter Merchant ID <strong className="text-brand-navy">{MOMO_MERCHANT_ID}</strong></li>
+                      <li>Confirm the merchant name shows <strong className="text-brand-navy">{MOMO_MERCHANT_NAME}</strong></li>
+                      <li>Enter the order amount and confirm with your MoMo PIN</li>
+                    </ol>
+                    <p className="text-xs text-gray-muted mt-3">
+                      You&apos;ll receive an SMS receipt — keep it as proof of payment. We&apos;ll confirm your order once payment is verified.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
