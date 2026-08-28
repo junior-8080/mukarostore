@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Share2, Check, Loader2 } from "lucide-react";
 
 const TEAL = "#0D9488";
+const SITE_URL = "https://www.mukarostore.com";
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -100,7 +101,7 @@ export default function ShareProductButton({
   const [loading, setLoading] = useState(false);
 
   async function handleShare() {
-    const url = `${window.location.origin}/product/${slug}`;
+    const url = `${SITE_URL}/product/${slug}`;
     const summary = `${name} — ₵${price.toLocaleString()}`;
     const text = `${summary}\n${url}`;
 
